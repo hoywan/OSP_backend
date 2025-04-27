@@ -67,7 +67,8 @@ sudo go get github.com/gin-gonic/gin
 
 ```
 
-9.	Enter "go run ." in the terminal
+9.	Enter "go run ." in the terminal, "Listening and serving HTTP on :8080" should be shown on the last output, which means the server is running
+10.	Click the "+" icon to open another terminal
 
 
 ## API documentation
@@ -120,6 +121,33 @@ curl -X POST http://localhost:8080/surveys \
         }
     ]
 }'
+```
+
+```terminal
+$uri = "http://localhost:8080/surveys"
+$headers = @{ "Content-Type" = "application/json" }
+$body = @{
+    title = "Lecture Satisfaction Survey 2"
+    questions = @(
+        @{
+            question = "What do you think about the difficulty of the lecture material?"
+            question_format = "Likert Scale"
+            specification = @("Very Easy", "Easy", "Neutral", "Difficult", "Very Difficult")
+        },
+        @{
+            question = "What do you think about my lecture style?"
+            question_format = "Multiple Choice"
+            specification = @("Bad", "Good")
+        },
+        @{
+            question = "Type a comment about the lecture"
+            question_format = "Textbox"
+            specification = @()
+        }
+    )
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
 ```
 
 Responses:
