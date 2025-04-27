@@ -26,7 +26,9 @@ OSP_backend is a backend for an Online Survey Platform web application. It was d
 ```terminal
 use admin
 ```
+"switched to db admin" can be seen
 
+You can use any user and pwd instead of the below
 ```terminal
 db.createUser(
 {
@@ -36,11 +38,13 @@ db.createUser(
 })
 ```
 
+"{ok: 1}" can be seen
+
 ### Install Visual Studio Code
 
 1.	Click link of the VS code official website [https://code.visualstudio.com/download](url) and download a compatible version based on your OS
 2.	Install it
-3.	
+3.	Change the "DB_USERNAME" and "DB_PASSWORD" in the .env file if you change the user and pwd in step 6 in "Install MongoDB"
 
 ### Install all dependencies
 
