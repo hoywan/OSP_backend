@@ -12,7 +12,7 @@ OSP_backend is a backend for an Online Survey Platform web application. It was d
 
 ### Install MongoDB
 
-1.	Download a community version of MongoDB by following the instructions of [https://www.mongodb.com/try/download/community](url)
+1.	Download a community version of MongoDB by following the instructions of <a href="https://www.mongodb.com/try/download/community">https://www.mongodb.com/try/download/community</a>
 2.	Install the complete version with the MongoDB compass
 3.	Click "+" icon
 
@@ -41,7 +41,7 @@ db.createUser(
 
 ### Install Visual Studio Code, all dependencies and run the application
 
-1.	Click link of the VS code official website [https://code.visualstudio.com/download](url) and download a compatible version based on your OS
+1.	Click link of the VS code official website <a href="https://code.visualstudio.com/download">https://code.visualstudio.com/download</a> and download a compatible version based on your OS
 2.	Install it
 3.	Donwload this repository and unzip it,
 4.	Click "Open Folder" in VS code to open the folder, which should contains .env and main.go e.g. OSP_backend-main
@@ -68,8 +68,8 @@ sudo go get github.com/gin-gonic/gin
 
 9.	Enter "go run ." in the terminal, "Listening and serving HTTP on :8080" should be shown on the last output, which means the server is running
 10.	For MacOS user, you can type curl command in the terminal app by following the doumentation below
-For Windows user, you can install [https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok](url)
-and enter curl command in [https://reqbin.com/curl](url)
+For Windows user, you can install <a href="https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok">https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok</a>
+and enter curl command in <a href="https://reqbin.com/curl">https://reqbin.com/curl</a>
 
 ## API documentation
 
@@ -121,33 +121,6 @@ curl -X POST http://localhost:8080/surveys \
         }
     ]
 }'
-```
-
-```terminal
-$uri = "http://localhost:8080/surveys"
-$headers = @{ "Content-Type" = "application/json" }
-$body = @{
-    title = "Lecture Satisfaction Survey 2"
-    questions = @(
-        @{
-            question = "What do you think about the difficulty of the lecture material?"
-            question_format = "Likert Scale"
-            specification = @("Very Easy", "Easy", "Neutral", "Difficult", "Very Difficult")
-        },
-        @{
-            question = "What do you think about my lecture style?"
-            question_format = "Multiple Choice"
-            specification = @("Bad", "Good")
-        },
-        @{
-            question = "Type a comment about the lecture"
-            question_format = "Textbox"
-            specification = @()
-        }
-    )
-} | ConvertTo-Json
-
-Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
 ```
 
 Responses:
