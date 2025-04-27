@@ -72,6 +72,12 @@ For Windows user, you can install an extension on <a target="_blank" href="https
 and enter curl command in <a target="_blank" href="https://reqbin.com/curl">https://reqbin.com/curl</a>
 11.	You can check view all data inside OSP>Survey in the MongoDB compass after you create one survey.
 
+### Solution to MongoDB problem (can't be connected, ECONNREFUSED 127.0.0.1:27017 in Compass)
+
+```terminal
+brew services restart mongodb-community@8.0
+```
+
 ## API documentation
 
 ### Survey
