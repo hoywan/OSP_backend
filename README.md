@@ -140,33 +140,16 @@ Example:
 
 The token is random generated, so it has less chance to be "5GXbe" again. You should use the one generated when trying other APIs.
 
-|    400   |  Bad Request  |       Description      |
+|    400   |  Output  |       Description      |
 |:---------:|:------:|:----------------------:|
-|      |             |      Binding input error      |
-|      |             | survey title less than 3 characters |
-|      |             | no questions |
-|      |             | question title less than 3 characters |
-|      |             | not either "Textbox" / "Multiple Choice" / "Likert Scale" |
-|      |             | specification for "Textbox" is not empty  |
-|      |             | specification for "Multiple Choice" has less than 2 elements |
-|      |             | specification for "Likert Scale" has less than 3 elements |
-
-Example:
-{"error":"Invalid input"}
-
-{"error":"The survey title must have at least 3 characters"}
-
-{"error":"Cannot be an empty survey"}
-
-{"error":"The question title should have at least 3 characters"}
-
-{"error":"Invalid question format"}
-
-{"error":"Textbox format should not have specification"}
-
-{"error":"Multiple Choice question should have at least 2 options"}
-
-{"error":"Likert Scale should have at least 3 options"}
+|      |     {"error":"Invalid input"}        |      Binding input error      |
+|      |     {"error":"The survey title must have at least 3 characters"}        | survey title less than 3 characters |
+|      |     {"error":"Cannot be an empty survey"}        | no questions |
+|      |       {"error":"The question title should have at least 3 characters"}      | question title less than 3 characters |
+|      |      {"error":"Invalid question format"}       | not either "Textbox" / "Multiple Choice" / "Likert Scale" |
+|      |     {"error":"Textbox format should not have specification"}        | specification for "Textbox" is not empty  |
+|      |     {"error":"Multiple Choice question should have at least 2 options"}        | specification for "Multiple Choice" has less than 2 elements |
+|      |      {"error":"Likert Scale should have at least 3 options"}       | specification for "Likert Scale" has less than 3 elements |
 
 | 500 | Internal Server Error |
 |------|----------|
@@ -280,38 +263,19 @@ Responses:
 | 200 | Survey successfully updated |
 |------|----------|
 
-{"message":"Survey successfully updated"
+{"message":"Survey successfully updated"}
 
 |    400   |  Bad Request  |       Description      |
 |:---------:|:------:|:----------------------:|
-|      |             | Invalid token e.g. not equal to 5 characters or containing any special characters    |
-|      |             |      Binding input error      |
-|      |             | survey title less than 3 characters |
-|      |             | no questions |
-|      |             | question title less than 3 characters |
-|      |             | not either "Textbox" / "Multiple Choice" / "Likert Scale" |
-|      |             | specification for "Textbox" is not empty  |
-|      |             | specification for "Multiple Choice" has less than 2 elements |
-|      |             | specification for "Likert Scale" has less than 3 elements |
-
-Example:
-{"error":"Invalid token"}
-
-{"error":"Invalid input"}
-
-{"error":"The survey title must have at least 3 characters"}
-
-{"error":"Cannot be an empty survey"}
-
-{"error":"The question title should have at least 3 characters"}
-
-{"error":"Invalid question format"}
-
-{"error":"Textbox format should not have specification"}
-
-{"error":"Multiple Choice question should have at least 2 options"}
-
-{"error":"Likert Scale should have at least 3 options"}
+|      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
+|      |    {"error":"Invalid input"}         |      Binding input error      |
+|      |       {"error":"The survey title must have at least 3 characters"}      | survey title less than 3 characters |
+|      |      {"error":"Cannot be an empty survey"}       | no questions |
+|      | {"error":"The question title should have at least 3 characters"} | question title less than 3 characters |
+|      |      {"error":"Invalid question format"}       | not either "Textbox" / "Multiple Choice" / "Likert Scale" |
+|      |     {"error":"Textbox format should not have specification"}        | specification for "Textbox" is not empty  |
+|      |      {"error":"Multiple Choice question should have at least 2 options"}       | specification for "Multiple Choice" has less than 2 elements |
+|      |       {"error":"Likert Scale should have at least 3 options"}      | specification for "Likert Scale" has less than 3 elements |
 
 | 404 | Survey not found with the input token |
 |------|----------|
@@ -396,38 +360,18 @@ Responses:
 
 {"message":"The survey question successfully updated"
 
-|    400   |  Bad Request  |       Description      |
+|    400   |  Output  |       Description      |
 |:---------:|:------:|:----------------------:|
-|      |             | Invalid token e.g. not equal to 5 characters or containing any special characters    |
-|      |             |      Binding input error      |
-|      |             |      Invalid question number e.g. less or equal than 0 or exceed the total no. of questions     |
-|      |             | survey title less than 3 characters |
-|      |             | no questions |
-|      |             | question title less than 3 characters |
-|      |             | not either "Textbox" / "Multiple Choice" / "Likert Scale" |
-|      |             | specification for "Textbox" is not empty  |
-|      |             | specification for "Multiple Choice" has less than 2 elements |
-|      |             | specification for "Likert Scale" has less than 3 elements |
-
-{"error":"Invalid token"}
-
-{"error":"Invalid input"}
-
-{"error":"Invalid question number"}
-
-{"error":"The survey title must have at least 3 characters"}
-
-{"error":"Cannot be an empty survey"}
-
-{"error":"The question title should have at least 3 characters"}
-
-{"error":"Invalid question format"}
-
-{"error":"Textbox format should not have specification"}
-
-{"error":"Multiple Choice question should have at least 2 options"}
-
-{"error":"Likert Scale should have at least 3 options"}
+|      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
+|      |     {"error":"Invalid input"}        |      Binding input error      |
+|      |     {"error":"Invalid question number"}       |      Invalid question number e.g. less or equal than 0 or exceed the total no. of questions     |
+|      |     {"error":"The survey title must have at least 3 characters"}        | survey title less than 3 characters |
+|      |      {"error":"Cannot be an empty survey"}       | no questions |
+|      |     {"error":"The question title should have at least 3 characters"}        | question title less than 3 characters |
+|      |     {"error":"Invalid question format"}        | not either "Textbox" / "Multiple Choice" / "Likert Scale" |
+|      |     {"error":"Textbox format should not have specification"}        | specification for "Textbox" is not empty  |
+|      |      {"error":"Multiple Choice question should have at least 2 options"}       | specification for "Multiple Choice" has less than 2 elements |
+|      |      {"error":"Likert Scale should have at least 3 options"}       | specification for "Likert Scale" has less than 3 elements |
 
 | 404 | Survey not found with the input token |
 |------|----------|
@@ -517,33 +461,16 @@ Response:
 
 <img width="506" alt="image" src="https://github.com/user-attachments/assets/4d4456e3-7020-4f3a-8827-ff03eaa13877" />
 
-|    400   |  Bad Request  |       Description      |
+|    400   |  Output  |       Description      |
 |:---------:|:------:|:----------------------:|
-|      |             | Invalid token e.g. not equal to 5 characters or containing any special characters    |
-|      |             |      Binding input error      |
-|      |             |      Invalid question number e.g. less or equal than 0 or exceed the total no. of questions     |
-|      |             |      Name less than 3 characters     |
-|      |             |     response not contain any answers     |
-|      |             |      the no. of elements in the answer array not match to the total no. of survey question     |
-|      |             |      Answer for Textbox question < 3 characters     |
-|      |             |      Answer is not the option that included in the specifcation of survey questions for MC & Likert Scale    |
-
-
-{"error":"Invalid token"}
-
-{"error":"Invalid input"}
-
-{"error":"Invalid question number"}
-
-{"error":"Your Name must have at least 3 characters"}
-
-{"error":"Not allow empty response"}
-
-{"error":"Please answer the exact number of questions"}
-
-{"error":"Answer must have at least 3 characters"}
-
-{"error":""Answer is not an option for question 2"}
+|      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
+|      |     {"error":"Invalid input"}        |      Binding input error      |
+|      |     {"error":"Invalid question number"}       |      Invalid question number e.g. less or equal than 0 or exceed the total no. of questions     |
+|      |     {"error":"Your Name must have at least 3 characters"}        |      Name less than 3 characters     |
+|      |      {"error":"Not allow empty response"}       |     response not contain any answers     |
+|      |{"error":"Please answer the exact number of questions"}|      the no. of elements in the answer array not match to the total no. of survey question     |
+|      |     {"error":"Answer must have at least 3 characters"}        |      Answer for Textbox question < 3 characters     |
+|      |      {"error":""Answer is not an option for question 2"}       |      Answer is not the option that included in the specifcation of survey questions for MC & Likert Scale    |
 
 | 404 | Survey not found with the input token |
 |------|----------|
