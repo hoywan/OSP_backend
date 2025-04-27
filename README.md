@@ -6,8 +6,7 @@ OSP_backend is a backend for an Online Survey Platform web application. It was d
 
 ### Install GO
 
-1.	Click link of the GO official website [https://go.dev
-](url) and download a compatible version based on your OS 
+1.	Click link of the GO official website <a href="https://go.dev">https://go.dev</a> and download a compatible version based on your OS 
 
 2.	Install it
 
