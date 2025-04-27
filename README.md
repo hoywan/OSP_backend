@@ -68,7 +68,7 @@ sudo go get github.com/gin-gonic/gin
 
 9.	Enter "go run ." in the terminal, "Listening and serving HTTP on :8080" should be shown on the last output, which means the server is running
 10.	For MacOS user, you can type curl command in the terminal app by following the doumentation below
-For Windows user, you can install <a target="_blank" href="https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok">https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok</a>
+For Windows user, you can install an extension on <a target="_blank" href="https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok">https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok</a>
 and enter curl command in <a target="_blank" href="https://reqbin.com/curl">https://reqbin.com/curl</a>
 
 ## API documentation
