@@ -40,17 +40,34 @@ db.createUser(
 
 "{ok: 1}" can be seen
 
-### Install Visual Studio Code
+### Install Visual Studio Code, all dependencies and run the application
 
 1.	Click link of the VS code official website [https://code.visualstudio.com/download](url) and download a compatible version based on your OS
 2.	Install it
-3.	Change the "DB_USERNAME" and "DB_PASSWORD" in the .env file if you change the user and pwd in step 6 in "Install MongoDB"
+3.	Donwload this repository and unzip it,
+4.	Click "Open Folder" in VS code to open the folder, which should contains .env and main.go e.g. OSP_backend-main
+5.	Change the "DB_USERNAME" and "DB_PASSWORD" in the .env file if you change the user and pwd in step 6 in "Install MongoDB"
+6.	Click "Ctrl", "Shift" and "`" at the same time to open a new terminal
+7.	Fix go module
 
-### Install all dependencies
-
-```bash
-pip install foobar
+```terminal
+go env -w GO111MODULE=on
 ```
+```terminal
+go mod init OSP_backend-main{replace here with your folder name}
+```
+8.	Install dependencies by entering the commands below one by one
+
+```teminal
+sudo go get github.com/joho/godotenv
+sudo go get go.mongodb.org/mongo-driver/mongo
+sudo go get go.mongodb.org/mongo-driver/mongo/options
+sudo go get github.com/gin-gonic/gin
+
+```
+
+9.	Enter "go run ." in the terminal
+
 
 ## API documentation
 
