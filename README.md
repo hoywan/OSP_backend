@@ -56,7 +56,7 @@ go env -w GO111MODULE=on
 ```terminal
 go mod init OSP_backend-main{replace here with your folder name}
 ```
-8.	Install dependencies by entering the commands below one by one
+8.	Install dependencies by entering the commands below one by onen with/without sudo
 
 ```teminal
 sudo go get github.com/joho/godotenv
