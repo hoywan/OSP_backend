@@ -469,8 +469,8 @@ Response:
 |      |     {"error":"Your Name must have at least 3 characters"}        |      Name less than 3 characters     |
 |      |      {"error":"Not allow empty response"}       |     response not contain any answers     |
 |      |{"error":"Please answer the exact number of questions"}|      the no. of elements in the answer array not match to the total no. of survey question     |
-|      |     {"error":"Answer must have at least 3 characters"}        |      Answer for Textbox question < 3 characters     |
-|      |      {"error":""Answer is not an option for question 2"}       |      Answer is not the option that included in the specifcation of survey questions for MC & Likert Scale    |
+|      |     {"error":"Answer should be 1 to 300 characters"}        |      Answer for Textbox question < 1 or > 300 characters      |
+|      |      {"error":""Answer is not an option for question X"}       |      Answer is not the option that included in the specifcation of questions for MC & Likert Scale    |
 
 | 404 | Survey not found with the input token |
 |------|----------|
