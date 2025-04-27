@@ -70,6 +70,7 @@ sudo go get github.com/gin-gonic/gin
 10.	For MacOS user, you can type curl command in the terminal app by following the doumentation below
 For Windows user, you can install an extension on <a target="_blank" href="https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok">https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok</a>
 and enter curl command in <a target="_blank" href="https://reqbin.com/curl">https://reqbin.com/curl</a>
+11.	You can check view all data inside OSP>Survey in the MongoDB compass after you create one survey.
 
 ## API documentation
 
@@ -129,6 +130,8 @@ Responses:
 
 Example:
 {"message":"Survey successfully created. The token of this survey is: 5GXbe"}
+
+The token is random generated, so it has less chance to be "5GXbe" again. You should use the one generated when trying other APIs.
 
 |    400   |  Bad Request  |       Description      |
 |:---------:|:------:|:----------------------:|
