@@ -6,9 +6,41 @@ OSP_backend is a backend for an Online Survey Platform web application. It was d
 
 ### Install GO
 
+1.	Click link of the GO official website [https://go.dev
+](url) and download a compatible version based on your OS 
+
+2.	Install it
+
 ### Install MongoDB
 
+1.	Download a community version of MongoDB by following the instructions of [https://www.mongodb.com/try/download/community](url)
+2.	Install the complete version with the MongoDB compass
+3.	Click "+" icon
+
+<img width="314" alt="image" src="https://github.com/user-attachments/assets/6d62fdf9-4950-400a-adb6-9d5bbded5007" />
+
+4.	Enter "OSP" in the "Database Name" field and "Survey" in the "Collection Name"
+5.	Click the "Create Database" button
+6.	Click "Open MongoDB shell", type the following commands
+
+```terminal
+use admin
+```
+
+```terminal
+db.createUser(
+{
+    user: "Andrew",
+    pwd: "a1sdcvd23@",
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+})
+```
+
 ### Install Visual Studio Code
+
+1.	Click link of the VS code official website [https://code.visualstudio.com/download](url) and download a compatible version based on your OS
+2.	Install it
+3.	
 
 ### Install all dependencies
 
