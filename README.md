@@ -4,7 +4,13 @@ OSP_backend is a backend for an Online Survey Platform web application. It was d
 
 ## Installation
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install foobar.
+### Install GO
+
+### Install MongoDB
+
+### Install Visual Studio Code
+
+### Install all dependencies
 
 ```bash
 pip install foobar
