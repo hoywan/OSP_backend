@@ -61,6 +61,7 @@ go mod init OSP_backend-main{replace here with your folder name}
 ```teminal
 sudo go get github.com/joho/godotenv
 sudo go get go.mongodb.org/mongo-driver/mongo
+sudo go get go.mongodb.org/mongo-driver/bson
 sudo go get go.mongodb.org/mongo-driver/mongo/options
 sudo go get github.com/gin-gonic/gin
 
