@@ -525,5 +525,17 @@ Response:
     ]
 }
 ```
+|    400   |  Bad Request  |       Description      |
+|:---------:|:------:|:----------------------:|
+|      |             | Invalid token e.g. not equal to 5 characters or containing any special characters    |
+
+{"error":"Invalid token"}
+
+| 404 | Survey not found with the input token |
+|------|----------|
+|      |No response e.g. the response array does not exists or empty|
 
 
+{"error":"Survey not found"}
+
+{"error":"No response"}
