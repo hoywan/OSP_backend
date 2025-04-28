@@ -192,6 +192,14 @@ func main() {
 		AuthMechanism: "SCRAM-SHA-256", //use sha256 to encrypt the password
 	})
 
+	opt.SetMaxPoolSize(120) //max pool size: 120, min: 0, allow 0-->120 connections to the db
+	opt.SetMinPoolSize(0)
+
+	opt.SetMaxConnIdleTime(10 * time.Second) //remove unused connections after 10s
+	
+	opt.SetConnectTimeout(10 * time.Second) //allow 10s to connect to the db
+	opt.SetSocketTimeout(30 * time.Second) //allow 30s to send/receive data
+
 	// create a new client and connect to the server
 	client, err := mongo.Connect(context.TODO(), opt)
 	if (err != nil) {
@@ -207,7 +215,18 @@ func main() {
 	}
 	fmt.Println("Connected to MongoDB!")
 
-	router := gin.Default()
+
+	//use indexes to speed up the search, use token as index since it is commonly used in most APIs
+	indexModel := mongo.IndexModel{
+		Keys: bson.M{"token": 1}, //create index on token
+		Options: options.Index().SetUnique(true), //set the index to be unique
+	}
+	_, err = surveysCollection.Indexes().CreateOne(context.TODO(), indexModel) //create the index
+	if (err != nil) {
+		log.Fatal(err)
+	}
+
+	router := gin.Default() //use Default instead of New, so default logger & recovery middleware can be used
 
 // create a new survey 
 	router.POST("/surveys", func(c *gin.Context) {
