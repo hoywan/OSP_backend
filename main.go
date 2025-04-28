@@ -668,14 +668,16 @@ func main() {
 			return
 		} else if (displayMode == "individual") {
 			var individualResponses []IndividualResponses
+
+			//loop responses arr and questions arr
 			for _, response := range survey.Responses {
 				var qa []QuestionAnswer
 				for i, question := range survey.Questions {
 
 					//Fix out of index error, if the answer is not found, make it to be empty string (it happens when the response was submitted before adding more questions), it will be insert "No answer" for the new question as stated before
 					var answer string
-					if (i < len(response.Answer)) { //
-						answer = response.Answer[i]
+					if (i < len(response.Answer)) {
+						answer = response.Answer[i] //insert the answer in answer[i] corresponds to question[i]
 					} else { //question is more than answer
 						answer = "" // make it to be empty string if the answer is not found
 					}
@@ -698,6 +700,7 @@ func main() {
 
 				// Count responses for the current question.
 				counts := make(map[string]int, len(question.Specification)) //create an empty map with key is answer options, and value is count
+				//since all answer are include in specification, so the map size is at most == no. of specification
 
 				for _, response := range survey.Responses {
 					if (i < len(response.Answer)) {
