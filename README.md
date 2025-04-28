@@ -79,7 +79,7 @@ Enter the below in terminal to restart the service
 brew services restart mongodb-community@8.0
 ```
 
-## API documentation
+## API
 
 <img width="690" alt="image" src="https://github.com/user-attachments/assets/ceaed8bb-ac51-4d1f-b083-1a2e67822d24" />
 <img width="690" alt="image" src="https://github.com/user-attachments/assets/2cd51cda-fd18-4ad9-832c-682b6719748d" />
@@ -136,6 +136,16 @@ curl -X POST http://localhost:8080/surveys \
 }'
 ```
 
+Explaination:
+1.	combine the request body with an empty survey object
+2.	use checkTitle function to ensure the title not already exists and between 2 to 300 characters
+3.	use a for loop to generate a new tokens using generateRandomToken function ensure the token not duplicated, count=0 means no same token can be searched, stop until 100 iterations if still can't find an unique token
+4.	check all questions using validateQuestions function which the question title,question format and specification will be checked
+5.	set the time of the survey created and LastModifiedTime to be the present time
+6.	set the responses array to be empty first
+7.	insert the survey into the database
+8.	Ouput successfully created and provide the token of the survey to the user
+
 Responses:
 | 200 | Survey successfully created. |
 |------|----------|
@@ -181,8 +191,13 @@ Example
 curl -X GET http://localhost:8080/surveys/5GXbe
 ```
 
+Explaination:
+1.	use checkToken function to check the token parameter, ensuring it has exactly 5 characters and not include any special characters
+2.	find the survey using the token as a filter and decode it into the empty survey object
+3.	output the below if no error
+
 Responses:
-| 200 | Output a JSON containing survey title and questions array |
+| 200 | Output a JSON containing survey title, questions array, time created, LastModifiedTime |
 |------|----------|
 
 Example:
@@ -270,6 +285,14 @@ curl -X PUT http://localhost:8080/surveys/5GXbe \
 }'
 ```
 
+Explaination:
+1.	use checkToken function to check the token parameter, ensuring it has exactly 5 characters and not include any special characters
+2.	find the survey using the token as a filter and decode it into the empty survey object
+3.	bind the request body with survey object
+4.	perform checking on tiles and questions using checkTitle function and validateQuestions function respectively
+5.	update the LastModifiedTime to present time
+6.	only update Title, Questions, LastModifiedTime, Responses in the survey with that token in the database
+
 Responses:
 | 200 | Survey successfully updated |
 |------|----------|
@@ -311,6 +334,11 @@ Example
 ```terminal
 curl -X DELETE http://localhost:8080/surveys/5GXbe
 ```
+
+Explaination:
+1.	use checkToken function to check the token parameter, ensuring it has exactly 5 characters and not include any special characters
+2.	find the survey using the token as a filter and decode it into the empty survey object
+3.	delete the survey in the database
 
 repsonse:
 | 200 | Survey successfully deleted |
@@ -361,6 +389,20 @@ curl -X POST http://localhost:8080/surveys/5GXbe/2 \
 	"specification": ["Definitely No", "No", "No commnet", "Yes", "Definitely"]
 }'
 ```
+
+Explaination:
+1.	use checkToken function to check the token parameter, ensuring it has exactly 5 characters and not include any special characters
+2.	find the survey using the token as a filter and decode it into the empty survey object
+3.	check the questionNo parameter should >= 1, question no. should not exceed total no. of questinos + 1(i.e. insert as the last question)
+4.	bind the request body with newQuestion object
+5.	perform checking on questions using validateQuestions function, need to change it into an array with only ine element for passing into the function
+6.	append the question based on different situations and change the response of this question to be "No answer" for the responses array, the detailed, please see the comment in the code. By adding "No answer" can prevent affecting the correspondence between the questions array and response answer array e.g. {questions[0] should correspond to all answer[0],questions[1] should correspond to all answer[1] etc}
+
+<img width="608" alt="image" src="https://github.com/user-attachments/assets/81e59f19-7be9-40d2-adb2-240d5ef9d61f" />
+<img width="268" alt="image" src="https://github.com/user-attachments/assets/ee89cfa6-0c1f-48ef-bb83-861e34aed5bd" />
+
+8.	update the LastModifiedTime to present time
+9.	only update Questions, LastModifiedTime, Responses in the survey with that token in the database
 
 Responses:
 | 200 | The question is successfully inserted with a preview of all questins |
@@ -461,11 +503,22 @@ curl -X PUT http://localhost:8080/surveys/5GXbe/2 \
 }'
 ```
 
+Explaination:
+1.	use checkToken function to check the token parameter, ensuring it has exactly 5 characters and not include any special characters
+2.	find the survey using the token as a filter and decode it into the empty survey object
+3.	check the questionNo parameter should >= 1, question no. should not exceed total no. of questinos + 1(i.e. insert as the last question)
+4.	bind the request body with EditQuestion object
+5.	assign the Question,QuestionFormat and Specification into the specific question with index (questionNo - 1)
+6.	perform validation in Questions array using validateQuestions function
+7.	replace all existed response of this question with "Deleted", preventing unmatched responses
+8.	update the LastModifiedTime to present time
+9.	only update Questions, LastModifiedTime, Responses in the survey with that token in the database
+
 Responses:
 | 200 | The survey question successfully updated |
 |------|----------|
 
-{"message":"The survey question successfully updated"
+{"message":"The survey question successfully updated"}
 
 |    400   |  Output  |       Description      |
 |:---------:|:------:|:----------------------:|
@@ -503,6 +556,15 @@ Example (delete the question 2 of survey with token 5GXbe):
 curl -X DELETE http://localhost:8080/surveys/5GXbe/2
 ```
 
+Explaination:
+1.	use checkToken function to check the token parameter, ensuring it has exactly 5 characters and not include any special characters
+2.	find the survey using the token as a filter and decode it into the empty survey object
+3.	check the questionNo parameter should >= 1, question no. should not exceed total no. of questinos + 1(i.e. insert as the last question)
+5.	delete the corresponding question with index (questionNo - 1) in the survey with the token parameter
+6.	update the LastModifiedTime to present time
+7.	if the question is deleted, the answer of this question should also be deleted,and the rest of the answers should be shifted to the left or just delete all last elements in each answer if the question is also the last
+9.	only update lastModifiedTime and Responses in the survey with that token in the database
+
 Response:
 | 200 | The survey question successfully updated |
 |------|----------|
@@ -511,12 +573,8 @@ Response:
 
 |    400   |  Bad Request  |       Description      |
 |:---------:|:------:|:----------------------:|
-|      |             | Invalid token e.g. not equal to 5 characters or containing any special characters    |
-|      |             |      Invalid question number e.g. less or equal than 0 or exceed the total no. of questions     |
-
-{"error":"Invalid token"}
-
-{"error":"Invalid question number"}
+|      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
+|      |       {"error":"Invalid question number"}      |      Invalid question number e.g. less or equal than 0 or exceed the total no. of questions     |
 
 | 404 | Survey not found with the input token |
 |------|----------|
@@ -558,6 +616,14 @@ curl -X POST http://localhost:8080/surveys/5GXbe/responses \
 }'
 ```
 
+Explaination:
+1.	use checkToken function to check the token parameter, ensuring it has exactly 5 characters and not include any special characters
+2.	find the survey using the token as a filter and decode it into the empty survey object
+3.	bind the request body with empty response object
+4.	use the current time as response.Time
+5.	check no empty response, the number of answers is equal to the number of questions and align with specification
+6.	append the response to the survey with that token in the database
+
 Response:
 
 | 200 | Reponse successfully submitted |
@@ -596,11 +662,22 @@ Response:
 
 Parameters: token(string),displayMode(string individual/overview)
 
+Explaination:
+1.	use checkToken function to check the token parameter, ensuring it has exactly 5 characters and not include any special characters
+2.	find the survey using the token as a filter and decode it into the empty survey object
+3.	check if there any responses, output "No response" if no
+4.	check the displayMode parameter should only be either individual or overview
+
 Example (Display the overview of all responses of the survey with token 5GXbe, hide names, show statistics):
 
 ```terminal
 curl -X GET http://localhost:8080/surveys/5GXbe/responses/overview
 ```
+Explaination:
+
+1.	the questions array stores all Q&A pairs, the answer will be accepted form the response array when the corresponding index in the Questions array is matched
+2.	the counts[answer] store all count for each answer like counts[blue] = 2 if 2 of answer blue are stored in the response array
+3.	calculate the percentage of single answer in all answers
 
 Response:
 
@@ -643,9 +720,14 @@ Example (Display individual responses of the survey with token 5GXbe):
 curl -X GET http://localhost:8080/surveys/5GXbe/responses/individual
 ```
 
+Explaination:
+
+1.	the qa, Q&A pairs stores question from the questions array and answer in answer array, like a matching
+2.	every response in responses array of ouput will contain the name, qa, time of response submission
+
 Response:
 
-| 200 | Output a JSON containing survey title and responses array storing name and Q&A pairs |
+| 200 | Output a JSON containing survey title and responses array storing name, Q&A pairs, time |
 |------|----------|
 
 ```terminal
