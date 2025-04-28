@@ -507,7 +507,7 @@ func main() {
 		}
 
 		questionNo, err := strconv.Atoi(c.Param("questionNo")) // get the question number string -> int
-		if err != nil || questionNo < 0 || questionNo > len(survey.Questions) { //question should >= 1, question number should not exceed total no of questinos
+		if err != nil || questionNo < 0 || questionNo > len(survey.Questions) { //question should >= 1, question number should not exceed total no. of questinos
 			c.JSON(400, gin.H{"error": "Invalid question number"})
 			return
 		}
