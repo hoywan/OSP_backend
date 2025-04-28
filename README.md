@@ -419,9 +419,9 @@ Response:
 
 | 500 | Internal Server Error |
 |------|----------|
-|      |Failed to delete the question|
-
-{"error":"Failed to delete the question"}
+|   {"error":"Failed to delete the question"}   |Failed to delete the question|
+|   {"error":"Failed to delete null value"}    |Failed to delete the null value|
+|   {"error":"Failed to update the modified time"}   |Failed to update the modified time|
 
 ### Response
 
@@ -438,7 +438,7 @@ Schema:
 
 |    Name   |  Type  |       Description      |
 |:---------:|:------:|:----------------------:|
-|   name   | string |      survey title      |
+|   name   | string |      response name      |
 | answer |  array | contains all answer to each question in the corresponding survey |
 
 Example (submit one response to the survey with token 5GXbe):
@@ -466,7 +466,7 @@ Response:
 |      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
 |      |     {"error":"Invalid input"}        |      Binding input error      |
 |      |     {"error":"Invalid question number"}       |      Invalid question number e.g. less or equal than 0 or exceed the total no. of questions     |
-|      |     {"error":"Your Name must have at least 3 characters"}        |      Name less than 3 characters     |
+|      |     {"error":"Your Name should be 2 to 100 characters"}        |      response name should be 2 to 100 char     |
 |      |      {"error":"Not allow empty response"}       |     response not contain any answers     |
 |      |{"error":"Please answer the exact number of questions"}|      the no. of elements in the answer array not match to the total no. of survey question     |
 |      |     {"error":"Answer should be 1 to 300 characters"}        |      Answer for Textbox question < 1 or > 300 characters      |
