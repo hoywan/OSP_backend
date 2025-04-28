@@ -108,7 +108,7 @@ func generateRandomToken() string {
 //validate questions
 func validateQuestions(questions []Question, c*gin.Context) error {
 	//check no empty survey
-	if len(questions)< 1 {
+	if (len(questions)< 1) {
 		c.JSON(400, gin.H{"error": "Cannot be an empty survey"})
 		return fmt.Errorf("Cannot be an empty survey") //return an error, preventing return nil
 	}		
@@ -161,11 +161,11 @@ func checkToken(token string, c*gin.Context) error {
 func checkTitle(title string, c*gin.Context) error {
 	//check title is not exist
 	count, err := surveysCollection.CountDocuments(context.TODO(), bson.M{"title": title})
-	if err != nil {
+	if (err != nil) {
 		c.JSON(500, gin.H{"error": "Failed to check the survey title"})
 		return fmt.Errorf("Failed to check the survey title")
 	}
-	if count > 0 { // title is not unique
+	if (count > 0) { // title is not unique
 		c.JSON(400, gin.H{"error": "The Survey Title already exists"})
 		return fmt.Errorf("The Survey Title already exists")
 	}
@@ -180,7 +180,7 @@ func checkTitle(title string, c*gin.Context) error {
 func main() {
 
 	err := godotenv.Load(".env") //load .env for confidential data i.e. username & pwd of db
-	if err != nil {
+	if (err != nil) {
 	  log.Fatalf(".env file cannot be loaded")
 	}
 
@@ -194,7 +194,7 @@ func main() {
 
 	// create a new client and connect to the server
 	client, err := mongo.Connect(context.TODO(), opt)
-	if err != nil {
+	if (err != nil) {
 		log.Fatal(err)
 	}
 
@@ -202,7 +202,7 @@ func main() {
 
 	// check the connection
 	err = client.Ping(context.TODO(), nil)
-	if err != nil {
+	if (err != nil) {
 		log.Fatal(err)
 	}
 	fmt.Println("Connected to MongoDB!")
@@ -212,13 +212,14 @@ func main() {
 // create a new survey 
 	router.POST("/surveys", func(c *gin.Context) {
 		var survey Survey
-		if err := c.BindJSON(&survey); err != nil { //combining the request body with the survey object
+		err := c.BindJSON(&survey)
+		if (err != nil) { //combining the request body with the survey object
 			c.JSON(400, gin.H{"error": "Invalid input"})
 			return
 		}
 
 		//check survey's title
-		if checkTitle(survey.Title, c) != nil {
+		if (checkTitle(survey.Title, c) != nil) {
 			return
 		}
 
@@ -230,12 +231,12 @@ func main() {
 
 			// check whether the token already exists by counting the token
 			count, err := surveysCollection.CountDocuments(context.TODO(), bson.M{"token": survey.Token})
-			if err != nil {
+			if (err != nil) {
 				c.JSON(500, gin.H{"error": "Failed to check token"})
 				return
 			}
 
-			if count == 0 { // token is unique, stop iterating
+			if (count == 0) { // token is unique, stop iterating
 				break
 			}
 
@@ -247,7 +248,7 @@ func main() {
 		}
 
 		//check all questions
-		if (validateQuestions(survey.Questions, c)) != nil {
+		if (validateQuestions(survey.Questions, c) != nil) {
 			return //hv error
 		}
 
@@ -259,8 +260,8 @@ func main() {
 		survey.Responses = []Response{}
 
 		// insert the survey into the database
-		_, err := surveysCollection.InsertOne(context.TODO(), survey)
-		if err != nil {
+		_, err = surveysCollection.InsertOne(context.TODO(), survey)
+		if (err != nil) {
 			c.JSON(500, gin.H{"error": "Failed to create survey"})
 			return
 		}
@@ -272,14 +273,14 @@ func main() {
 	// display a new survey using the input token
 	router.GET("/surveys/:token", func(c *gin.Context) {
 		token := c.Param("token") // Get the input token
-		if checkToken(token,c) != nil {
+		if (checkToken(token,c) != nil) {
 			return
 		}
 
 		var survey Survey
 		
 		err := surveysCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&survey) // search survey with that token, assign it to the empty survey obj
-		if err != nil {
+		if (err != nil) {
 			c.JSON(404, gin.H{"error": "Survey not found"})
 			return
 		}
@@ -290,30 +291,31 @@ func main() {
 // edit a survey in all fields
 	router.PUT("/surveys/:token", func(c *gin.Context) {
 		token := c.Param("token") // get the input token
-		if checkToken(token,c) != nil {
+		if (checkToken(token,c) != nil) {
 			return
 		}
 
 		var survey Survey
 
 		err := surveysCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&survey) // search survey
-		if err != nil {
+		if (err != nil) {
 			c.JSON(404, gin.H{"error": "Survey not found"})
 			return
 		}
 
-		if err := c.BindJSON(&survey); err != nil {
+		err = c.BindJSON(&survey)
+		if (err != nil) { //combining the request body with the survey object
 			c.JSON(400, gin.H{"error": "Invalid input"})
 			return
 		}
 
 		//check survey title
-		if checkTitle(survey.Title, c) != nil {
+		if (checkTitle(survey.Title, c) != nil) {
 			return
 		}
 
 		//check all questions
-		if (validateQuestions(survey.Questions, c)) != nil {
+		if (validateQuestions(survey.Questions, c) != nil) {
 			return
 		}
 
@@ -328,7 +330,7 @@ func main() {
 			bson.M{"token": token}, 
 			bson.M{"$set": bson.M{"title": survey.Title, "questions": survey.Questions, "lastModifiedTime": survey.LastModifiedTime, "responses": survey.Responses }}) //update title and question arr in the survey with that token
 
-		if err != nil {
+		if (err != nil) {
 			c.JSON(500, gin.H{"error": "Failed to update survey"})
 			return
 		}
@@ -339,7 +341,7 @@ func main() {
 //delete a survey
 	router.DELETE("/surveys/:token", func(c *gin.Context) {
 		token := c.Param("token") // get the input token
-		if checkToken(token,c) != nil {
+		if (checkToken(token,c) != nil) {
 			return
 		}
 
@@ -347,7 +349,7 @@ func main() {
 
 		err := surveysCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&survey) // search survey
 
-		if err != nil {
+		if (err != nil) {
 			c.JSON(404, gin.H{"error": "Survey not found"})
 			return
 		}
@@ -355,7 +357,7 @@ func main() {
 		// Delete the survey from the db based on the token
 		_, err = surveysCollection.DeleteOne(context.TODO(),bson.M{"token": token})
 
-		if err != nil {
+		if (err != nil) {
 			c.JSON(500, gin.H{"error": "Failed to delete survey"})
 			return
 		}
@@ -366,12 +368,12 @@ func main() {
 //insert a question e.g. questionNo = 2, insert a question between persent Q1 & Q2
 	router.POST("/surveys/:token/:questionNo", func(c *gin.Context) {
 		token := c.Param("token") // get the input token
-		if checkToken(token,c) != nil {
+		if (checkToken(token,c) != nil) {
 			return
 		}
 		var survey Survey
 		err := surveysCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&survey) // search survey
-		if err != nil {
+		if (err != nil) {
 			c.JSON(404, gin.H{"error": "Survey not found"})
 			return
 		}
@@ -379,32 +381,35 @@ func main() {
 		insertQuestionNo := c.Param("questionNo")
 		questionNo, err := strconv.Atoi(insertQuestionNo) // get the question number string -> int
 
-		if err != nil || questionNo <= 0 || questionNo > len(survey.Questions) + 1 { //question should >= 1, question no. should not exceed total no. of questions + 1
+		if (err != nil || questionNo <= 0 || questionNo > len(survey.Questions) + 1) { //question should >= 1, question no. should not exceed total no. of questions + 1
 			c.JSON(400, gin.H{"error": "Invalid question number"})
 			return
 		}
 
 		arrIndex := questionNo - 1 //e.g. Q1 is at Questions[0], arrIndex means array index
+
 		var newQuestion Question
-		if err := c.BindJSON(&newQuestion); err != nil { //combine req. body with newQuestion
+
+		err = c.BindJSON(&newQuestion)
+		if (err != nil) { //combining the request body with the survey object
 			c.JSON(400, gin.H{"error": "Invalid input"})
 			return
 		}
 
-		if validateQuestions([]Question{newQuestion}, c) != nil { //check the new question by putting it into a arr
+		if (validateQuestions([]Question{newQuestion}, c) != nil) { //check the new question by putting it into a arr
 			return
 		} 
 
 		//insert the new question into the Questions array
 
 		//if the questionNo is 1, insert the new question at the beginning
-		if arrIndex == 0 {
+		if (arrIndex == 0) {
 			survey.Questions = append([]Question{newQuestion}, survey.Questions...)
 			//put all existed responses to the back, added "No answer" to the new question
 			for i := range survey.Responses { //loop all responses
 				survey.Responses[i].Answer = append([]string{"No answer"}, survey.Responses[i].Answer...)
 			}
-		} else if arrIndex == len(survey.Questions) { //if the questionNo is the last question, just append it to the array
+		} else if (arrIndex == len(survey.Questions)) { //if the questionNo is the last question, just append it to the array
 			survey.Questions = append(survey.Questions, newQuestion)
 			//append "No answer" to the new question for all responses
 			for i := range survey.Responses { //loop all responses
@@ -426,7 +431,7 @@ func main() {
 		_, err = surveysCollection.UpdateOne(context.TODO(),
 			bson.M{"token": token},
 			bson.M{"$set": bson.M{"questions": survey.Questions, "lastModifiedTime": survey.LastModifiedTime, "responses": survey.Responses}}) //update the question arr which has one edited question
-		if err != nil {
+		if (err != nil) {
 			c.JSON(500, gin.H{"error": "Failed to insert a question"})
 			return
 		}
@@ -436,26 +441,27 @@ func main() {
 //edit a question
 	router.PUT("/surveys/:token/:questionNo", func(c *gin.Context) {
 		token := c.Param("token") // get the input token
-		if checkToken(token,c) != nil {
+		if (checkToken(token,c) != nil) {
 			return
 		}
 
 		var survey Survey
 
 		err := surveysCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&survey) // search survey
-		if err != nil {
+		if (err != nil) {
 			c.JSON(404, gin.H{"error": "Survey not found"})
 			return
 		}
 
 		questionNo, err := strconv.Atoi(c.Param("questionNo")) // get the question number string -> int
-		if err != nil || questionNo <= 0 || questionNo > len(survey.Questions) {
+		if (err != nil || questionNo <= 0 || questionNo > len(survey.Questions)) { 
 			c.JSON(400, gin.H{"error": "Invalid question number"})
 			return
 		}
 
 		var editQuestion EditQuestion
-		if err := c.BindJSON(&editQuestion); err != nil { //combine req. body with editQuestion
+		err = c.BindJSON(&editQuestion)
+		if (err != nil) {
 			c.JSON(400, gin.H{"error": "Invalid input"})
 			return
 		}
@@ -467,7 +473,7 @@ func main() {
 		survey.Questions[arrIndex].Specification = editQuestion.Specification
 
 		//check all questions
-		if (validateQuestions(survey.Questions, c)) != nil {
+		if (validateQuestions(survey.Questions, c) != nil) {
 			return
 		}
 
@@ -485,7 +491,7 @@ func main() {
 			bson.M{"token": token}, 
 			bson.M{"$set": bson.M{"questions": survey.Questions, "lastModifiedTime": survey.LastModifiedTime, "responses": survey.Responses}}) //update the question arr which has one edited question
 
-		if err != nil {
+		if (err != nil) {
 			c.JSON(500, gin.H{"error": "Failed to update a question"})
 			return
 		}
@@ -495,19 +501,19 @@ func main() {
 //delete a question
 	router.DELETE("/surveys/:token/:questionNo", func(c *gin.Context) {
 		token := c.Param("token") // get the input token
-		if checkToken(token,c) != nil {
+		if (checkToken(token,c) != nil) {
 			return
 		}
 
 		var survey Survey
 		err := surveysCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&survey) // search survey
-		if err != nil {
+		if (err != nil) {
 			c.JSON(404, gin.H{"error": "Survey not found"})
 			return
 		}
 
 		questionNo, err := strconv.Atoi(c.Param("questionNo")) // get the question number string -> int
-		if err != nil || questionNo < 0 || questionNo > len(survey.Questions) { //question should >= 1, question number should not exceed total no. of questinos
+		if (err != nil || questionNo < 0 || questionNo > len(survey.Questions)) { //question should >= 1, question number should not exceed total no of questinos
 			c.JSON(400, gin.H{"error": "Invalid question number"})
 			return
 		}
@@ -519,7 +525,7 @@ func main() {
 			bson.M{"token": token}, 
 			bson.M{"$unset": bson.M{fmt.Sprintf("questions.%d", arrIndex): ""}}) // delete the question based on index			
 
-		if err != nil {
+		if (err != nil) {
 			c.JSON(500, gin.H{"error": "Failed to delete the question"})
 			return
 		}
@@ -529,7 +535,7 @@ func main() {
 			bson.M{"token": token},
 			bson.M{"$pull": bson.M{"questions": nil}})
 
-		if err != nil {
+		if (err != nil) {
 			c.JSON(500, gin.H{"error": "Failed to delete the null value"})
 			return
 		}
@@ -538,7 +544,7 @@ func main() {
 
 		// if the question is deleted, the answer of this question should also be deleted,and the rest of the answers should be shifted to the left
 		for i := range survey.Responses { //loop all responses
-			if arrIndex < len(survey.Responses[i].Answer) { //if the question is not the last question
+			if (arrIndex < len(survey.Responses[i].Answer)) { //if the question is not the last question
 				survey.Responses[i].Answer = append(survey.Responses[i].Answer[:arrIndex], survey.Responses[i].Answer[arrIndex+1:]...) //shift the answer to the left
 			} else { //if the question is the last question
 				survey.Responses[i].Answer = survey.Responses[i].Answer[:arrIndex] //delete the last answer
@@ -548,7 +554,7 @@ func main() {
 		_, err = surveysCollection.UpdateOne(context.TODO(),
 			bson.M{"token": token},
 			bson.M{"$set": bson.M{"lastModifiedTime": survey.LastModifiedTime, "responses": survey.Responses}}) //update the last modified time and responses
-		if err != nil {
+		if (err != nil) {
 			c.JSON(500, gin.H{"error": "Failed to update the modified time/responses"})
 			return
 		}
@@ -559,20 +565,21 @@ func main() {
 //submit a repsonse to a survey
 	router.POST("/surveys/:token/responses", func(c *gin.Context) {
 		token := c.Param("token") // get the input token
-		if checkToken(token,c) != nil {
+		if (checkToken(token,c) != nil) {
 			return
 		}
 
 		var survey Survey
 
 		err := surveysCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&survey) // search survey
-		if err != nil {
+		if (err != nil) {
 			c.JSON(404, gin.H{"error": "Survey not found"})
 			return
 		}
 
 		var response Response
-		if err := c.BindJSON(&response); err != nil {
+		err = c.BindJSON(&response)
+		if (err != nil) { //combining the request body with the empty response obj
 			c.JSON(400, gin.H{"error": "Invalid input"})
 			return
 		}
@@ -586,13 +593,13 @@ func main() {
 		}
 
 		//check no empty response
-		if len(response.Answer) < 1 {
+		if (len(response.Answer) < 1) {
 			c.JSON(400, gin.H{"error": "Not allow empty response"})
 			return
 		}
 
 		//check the no. of answers is equal to no. of questions
-		if len(response.Answer) != len(survey.Questions) {
+		if (len(response.Answer) != len(survey.Questions)) {
 			c.JSON(400, gin.H{"error": "Please answer the exact number of questions"})
 			return
 		}
@@ -624,7 +631,7 @@ func main() {
 			bson.M{"token": token},
 			bson.M{"$push": bson.M{"responses": response}})
 
-		if err != nil {
+		if (err != nil) {
 			c.JSON(500, gin.H{"error": "Failed to submit reponse"})
 			return
 		}
@@ -634,14 +641,14 @@ func main() {
 //display responses of a survey
 	router.GET("/surveys/:token/responses/:displayMode", func(c *gin.Context) {
 		token := c.Param("token")
-		if checkToken(token,c) != nil {
+		if (checkToken(token,c) != nil) {
 			return
 		}
 
 		var survey SurveyWithResponses
 
 		err := surveysCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&survey)
-		if err != nil {
+		if (err != nil) {
 			c.JSON(404, gin.H{"error": "Survey not found"})
 			return
 		}
@@ -655,10 +662,11 @@ func main() {
 		//displayMode = overview, show the overview of all responses (Question 1 + ans1{each option count the no.,% } + Question 2 + ans 2 +...+) //hide response name for privacy
 
 		displayMode := c.Param("displayMode")
+
 		if (displayMode != "individual") && (displayMode != "overview") {
 			c.JSON(400, gin.H{"error": "Invalid display mode"})
 			return
-		} else if displayMode == "individual" {
+		} else if (displayMode == "individual") {
 			var individualResponses []IndividualResponses
 			for _, response := range survey.Responses {
 				var qa []QuestionAnswer
@@ -666,7 +674,7 @@ func main() {
 
 					//Fix out of index error, if the answer is not found, make it to be empty string (it happens when the response was submitted before adding more questions), it will be insert "No answer" for the new question as stated before
 					var answer string
-					if i < len(response.Answer) { //
+					if (i < len(response.Answer)) { //
 						answer = response.Answer[i]
 					} else { //question is more than answer
 						answer = "" // make it to be empty string if the answer is not found
@@ -678,18 +686,13 @@ func main() {
 					})
 				}
 				individualResponses = append(individualResponses, IndividualResponses{
-					Name: response.Name,
-					QA: qa,
-					Time: response.Time,
+					Name: response.Name, QA: qa, Time: response.Time,
 				})
 			}
-			formatted := FormattedIndividualResponses{
-				Title:     survey.Title,
-				Responses: individualResponses,
-			}
+			formatted := FormattedIndividualResponses{Title: survey.Title, Responses: individualResponses,}
 			c.IndentedJSON(200, formatted)
 			
-		} else if displayMode == "overview" {
+		} else if (displayMode == "overview") {
 			var overviewQuestions []OverviewQuestions //used to store multiple questions with their answers+analysis
 			for i, question := range survey.Questions {
 
@@ -697,28 +700,28 @@ func main() {
 				counts := make(map[string]int, len(question.Specification)) //create an empty map with key is answer options, and value is count
 
 				for _, response := range survey.Responses {
-					if i < len(response.Answer) {
+					if (i < len(response.Answer)) {
 						counts[response.Answer[i]]++ //e.g. {"red": 5, "blue": 8, "green": 1},response.Answer[i] is answer in response
 					} else { //question is more than answer
-						counts["No answer"]++
+						counts["No answer"]++ //group empty string as "No answer" if any
 					}
 				}
 
 				total := len(survey.Responses) //total no. of responses
 				var analysis []string //create a empty string array to store the answer and its count
 				for answer, count := range counts { //optain the key-value pair in the map counts
-					analysis = append(analysis, fmt.Sprintf("%s (%d, %.2f%%)", answer, count, float64(count)/float64(total)*100)) //e.g. "red[answer] (5[count], 33.33%[percentage count over total])"
+					calPercent := float64(count) /float64(total) *100 //calculate the percentage
+					analysis = append(analysis, fmt.Sprintf("%s (%d, %.2f%%)", answer, count, calPercent)) //e.g. "red[answer] (5[count], 33.33%[percentage count over total])"
 				}
 				overviewQuestions = append(overviewQuestions, OverviewQuestions{ 
-					Question: question.Question,
-					Answer:   analysis,
+					Question: question.Question, Answer: analysis,
 				})
 			}
+
 			formatted := FormattedOverviewResponses{
-				Title: survey.Title,
-				NumberOfResponses: len(survey.Responses),
-				Questions: overviewQuestions,
+				Title: survey.Title, NumberOfResponses: len(survey.Responses), Questions: overviewQuestions,
 			}
+
 			c.IndentedJSON(200, formatted)
 		}
 
@@ -731,7 +734,8 @@ func main() {
 
 	// close the mongodb connection when the application stop
 	defer func() {
-		if err = client.Disconnect(context.TODO()); err != nil {
+		err := client.Disconnect(context.TODO()); 
+		if (err != nil) {
 			log.Fatal(err)
 		}
 		fmt.Println("Connection to database is closed.")
