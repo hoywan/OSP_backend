@@ -143,7 +143,9 @@ The token is random generated, so it has less chance to be "5GXbe" again. You sh
 |    400   |  Output  |       Description      |
 |:---------:|:------:|:----------------------:|
 |      |     {"error":"Invalid input"}        |      Binding input error      |
+|      |     {"error":"The Survey Title already exists"}        |     The Survey Title already exists in DB     |
 |      |     {"error":"The survey title must have at least 3 characters"}        | survey title less than 3 characters |
+|      |     {"error":"The Survey title should be 2 to 300 characters"}        | The Survey title should be 2 to 300 characters |
 |      |     {"error":"Cannot be an empty survey"}        | no questions |
 |      |       {"error":"The question title should have at least 3 characters"}      | question title less than 3 characters |
 |      |      {"error":"Invalid question format"}       | not either "Textbox" / "Multiple Choice" / "Likert Scale" |
@@ -153,13 +155,10 @@ The token is random generated, so it has less chance to be "5GXbe" again. You sh
 
 | 500 | Internal Server Error |
 |------|----------|
-|      |Failed to check token|
-|      |Failed to create survey|
-
-Example:
-{"error":"Failed to check token"}
-
-{"error":"Failed to create survey"}
+|   {"error":"Failed to check token"}   |Failed to check token|
+|  {"error":"Failed to create survey"}    |Failed to create survey|
+|  {"error":"Failed to generate a unique token"}    |Failed to generate a unique token|
+|  {"error":"Failed to check the survey title"}    |Failed to check title|
 
 ### (2) Displaying a survey
 | GET | /surveys/:token |
@@ -269,7 +268,9 @@ Responses:
 |:---------:|:------:|:----------------------:|
 |      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
 |      |    {"error":"Invalid input"}         |      Binding input error      |
-|      |       {"error":"The survey title must have at least 3 characters"}      | survey title less than 3 characters |
+|      |     {"error":"The Survey Title already exists"}        |     The Survey Title already exists in DB     |
+|      |     {"error":"The survey title must have at least 3 characters"}        | survey title less than 3 characters |
+|      |     {"error":"The Survey title should be 2 to 300 characters"}        | The Survey title should be 2 to 300 characters |
 |      |      {"error":"Cannot be an empty survey"}       | no questions |
 |      | {"error":"The question title should have at least 3 characters"} | question title less than 3 characters |
 |      |      {"error":"Invalid question format"}       | not either "Textbox" / "Multiple Choice" / "Likert Scale" |
@@ -284,9 +285,8 @@ Responses:
 
 | 500 | Internal Server Error |
 |------|----------|
-|      |Failed to update survey|
-
-{"error":"Failed to update survey"}
+|  {"error":"Failed to update survey"}    |Failed to update survey|
+|  {"error":"Failed to check the survey title"}    |Failed to check the survey title|
 
 ### (4) Deleting a survey
 
@@ -421,7 +421,7 @@ Response:
 |------|----------|
 |   {"error":"Failed to delete the question"}   |Failed to delete the question|
 |   {"error":"Failed to delete null value"}    |Failed to delete the null value|
-|   {"error":"Failed to update the modified time"}   |Failed to update the modified time|
+|   {"error":"Failed to update the modified time/responses"}   |Failed to update the modified time/responses|
 
 ### Response
 
