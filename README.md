@@ -138,7 +138,12 @@ Responses:
 Example:
 {"message":"Survey successfully created. The token of this survey is: 5GXbe"}
 
-The token is random generated, so it has less chance to be "5GXbe" again. You should use the one generated when trying other APIs.
+The token is random generated, so it has very little chance to be "5GXbe" again. You should use the one generated when trying other APIs.
+
+Responses
+
+<img width="662" alt="image" src="https://github.com/user-attachments/assets/94d06121-662d-4f22-b26c-113546155e7a" />
+
 
 |    400   |  Output  |       Description      |
 |:---------:|:------:|:----------------------:|
@@ -179,6 +184,8 @@ Responses:
 Example:
 ```terminal
 {
+    "lastModifiedTime": "2025-04-28 16:04:53",
+    "number_of_questions": 3,
     "questions": [
         {
             "question": "What do you think about the difficulty of the lecture material?",
@@ -205,7 +212,8 @@ Example:
             "specification": []
         }
     ],
-    "title": "Lecture Satisfaction Survey 2"
+    "time": "2025-04-28 16:04:53",
+    "title": "Lecture Satisfaction Survey 7"
 }
 ```
 
@@ -448,7 +456,7 @@ curl -X POST http://localhost:8080/surveys/5GXbe/responses \
 -H "Content-Type: application/json" \
 -d '{
 	"name": "WAN Ho Yeung",
-	"answer": ["Satisfied","Blue"]
+	"answer": ["Easy","Bad","I love lecture"]
 }'
 ```
 
@@ -459,7 +467,7 @@ Response:
 
 {"message":"Reponse successfully submitted"}
 
-<img width="506" alt="image" src="https://github.com/user-attachments/assets/4d4456e3-7020-4f3a-8827-ff03eaa13877" />
+<img width="662" alt="image" src="https://github.com/user-attachments/assets/034fa2fc-b425-4f02-939d-ec4ad1256349" />
 
 |    400   |  Output  |       Description      |
 |:---------:|:------:|:----------------------:|
@@ -485,15 +493,15 @@ Response:
 
 ### (2) Displaying all responses in a survey
 
-| POST | /surveys/:token/responses |
+| POST | /surveys/:token/responses/:displayMode |
 |------|----------|
 
-Parameters: token(string)
+Parameters: token(string),displayMode(string individual/overview)
 
-Example (Display all responses of the survey with token 5GXbe):
+Example (Display the overview of all responses of the survey with token 5GXbe, hide names, show statistics):
 
 ```terminal
-curl -X GET http://localhost:8080/surveys/5GXbe/responses
+curl -X GET http://localhost:8080/surveys/5GXbe/responses/overview
 ```
 
 Response:
@@ -503,22 +511,102 @@ Response:
 
 ```terminal
 {
-    "response": [
+    "title": "Lecture Satisfaction Survey 7",
+    "number_of_responses": 3,
+    "questions": [
+        {
+            "question": "What do you think about the difficulty of the lecture material?",
+            "answer": [
+                "Easy (1, 33.33%)",
+                "Difficult (1, 33.33%)",
+                "Very Easy (1, 33.33%)"
+            ]
+        },
+        {
+            "question": "What do you think about my lecture style?",
+            "answer": [
+                "Bad (3, 100.00%)"
+            ]
+        },
+        {
+            "question": "Type a comment about the lecture",
+            "answer": [
+                "I love lecture (1, 33.33%)",
+                "Can speak faster (2, 66.67%)"
+            ]
+        }
+    ]
+}
+```
+
+Example (Display individual responses of the survey with token 5GXbe):
+
+```terminal
+curl -X GET http://localhost:8080/surveys/5GXbe/responses/individual
+```
+
+Response:
+
+| 200 | Output a JSON containing response array |
+|------|----------|
+
+```terminal
+{
+    "title": "Lecture Satisfaction Survey 7",
+    "responses": [
         {
             "name": "WAN Ho Yeung",
-            "answer": [
-                "Satisfied",
-                "Blue"
+            "qa": [
+                {
+                    "question": "What do you think about the difficulty of the lecture material?",
+                    "answer": "Easy"
+                },
+                {
+                    "question": "What do you think about my lecture style?",
+                    "answer": "Bad"
+                },
+                {
+                    "question": "Type a comment about the lecture",
+                    "answer": "I love lecture"
+                }
             ],
-            "time": "2025-04-28 00:52:10"
+            "time": "2025-04-28 16:16:32"
         },
         {
             "name": "Andrew",
-            "answer": [
-                "Unsatisfied",
-                "Red"
+            "qa": [
+                {
+                    "question": "What do you think about the difficulty of the lecture material?",
+                    "answer": "Difficult"
+                },
+                {
+                    "question": "What do you think about my lecture style?",
+                    "answer": "Bad"
+                },
+                {
+                    "question": "Type a comment about the lecture",
+                    "answer": "Can speak faster"
+                }
             ],
-            "time": "2025-04-28 01:05:57"
+            "time": "2025-04-28 16:17:24"
+        },
+        {
+            "name": "Candy",
+            "qa": [
+                {
+                    "question": "What do you think about the difficulty of the lecture material?",
+                    "answer": "Very Easy"
+                },
+                {
+                    "question": "What do you think about my lecture style?",
+                    "answer": "Bad"
+                },
+                {
+                    "question": "Type a comment about the lecture",
+                    "answer": "Can speak faster"
+                }
+            ],
+            "time": "2025-04-28 16:19:09"
         }
     ]
 }
