@@ -81,6 +81,11 @@ brew services restart mongodb-community@8.0
 
 ## API documentation
 
+<img width="690" alt="image" src="https://github.com/user-attachments/assets/ceaed8bb-ac51-4d1f-b083-1a2e67822d24" />
+<img width="690" alt="image" src="https://github.com/user-attachments/assets/2cd51cda-fd18-4ad9-832c-682b6719748d" />
+<img width="690" alt="image" src="https://github.com/user-attachments/assets/83d3d7ec-d93b-45e1-b984-f70ed18e9a3a" />
+
+
 ### Survey
 
 ### (1) Creating a survey
