@@ -93,7 +93,7 @@ var surveysCollection *mongo.Collection
 func generateRandomToken() string {
 	//string containing all letters and numbers
 	const combination = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	const tokenLength = 5
+	const tokenLength = 5 //required length of token 
 
 	token := make([]byte, tokenLength) //make an empty byte array
 	for i := range token {
@@ -284,7 +284,7 @@ func main() {
 			return
 		}
 		// return the survey title & questions
-		c.IndentedJSON(200, gin.H{"questions": survey.Questions, "title": survey.Title}) //IndentedJSON is for prettier output
+		c.IndentedJSON(200, gin.H{"questions": survey.Questions, "title": survey.Title, "number_of_questions": len(survey.Questions), "time": survey.Time, "lastModifiedTime": survey.LastModifiedTime}) //IndentedJSON is for prettier output
 	})
 
 // edit a survey in all fields
@@ -336,8 +336,8 @@ func main() {
 		
 	})
 
-//edit a question
-	router.PUT("/surveys/:token/:questionNo", func(c *gin.Context) {
+//delete a survey
+	router.DELETE("/surveys/:token", func(c *gin.Context) {
 		token := c.Param("token") // get the input token
 		if checkToken(token,c) != nil {
 			return
@@ -346,54 +346,22 @@ func main() {
 		var survey Survey
 
 		err := surveysCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&survey) // search survey
+
 		if err != nil {
 			c.JSON(404, gin.H{"error": "Survey not found"})
 			return
 		}
 
-		var editQuestion EditQuestion
-		if err := c.BindJSON(&editQuestion); err != nil { //combine req. body with editQuestion
-			c.JSON(400, gin.H{"error": "Invalid input"})
-			return
-		}
-
-		questionNo, err := strconv.Atoi(c.Param("questionNo")) // get the question number string -> int
-		if err != nil || questionNo <= 0 || questionNo > len(survey.Questions) {
-			c.JSON(400, gin.H{"error": "Invalid question number"})
-			return
-		}
-
-		arrIndex := questionNo - 1 //e.g. Q1 is at Questions[0]
-
-		survey.Questions[arrIndex].Question = editQuestion.Question
-		survey.Questions[arrIndex].QuestionFormat = editQuestion.QuestionFormat
-		survey.Questions[arrIndex].Specification = editQuestion.Specification
-
-		//check all questions
-		if (validateQuestions(survey.Questions, c)) != nil {
-			return
-		}
-
-		if(survey.Responses != nil) { //if the survey has no responses, no need to delete the responses
-			//All responses of this question will be deleted, preventing unmatched responses
-			for i := range survey.Responses { //loop all responses
-				survey.Responses[i].Answer[arrIndex] = "Deleted" //set the answer of this question to be "Deleted"
-			}
-		}
-
-		survey.LastModifiedTime = time.Now().Format("2006-01-02 15:04:05")  //update the time of the survey last modified
-
-		// update in the database
-		_, err = surveysCollection.UpdateOne(context.TODO(),
-			bson.M{"token": token}, 
-			bson.M{"$set": bson.M{"questions": survey.Questions, "lastModifiedTime": survey.LastModifiedTime, "responses": survey.Responses}}) //update the question arr which has one edited question
+		// Delete the survey from the db based on the token
+		_, err = surveysCollection.DeleteOne(context.TODO(),bson.M{"token": token})
 
 		if err != nil {
-			c.JSON(500, gin.H{"error": "Failed to update a question"})
+			c.JSON(500, gin.H{"error": "Failed to delete survey"})
 			return
 		}
-		c.JSON(200, gin.H{"message": "The survey question successfully updated"})
+		c.JSON(200, gin.H{"message": "Survey successfully deleted"})
 	})
+
 
 //insert a question e.g. questionNo = 2, insert a question between persent Q1 & Q2
 	router.POST("/surveys/:token/:questionNo", func(c *gin.Context) {
@@ -411,12 +379,12 @@ func main() {
 		insertQuestionNo := c.Param("questionNo")
 		questionNo, err := strconv.Atoi(insertQuestionNo) // get the question number string -> int
 
-		if err != nil || questionNo <= 0 || questionNo > len(survey.Questions) + 1 { //question should >= 1, question no. should not exceed total no. of questinos + 1
+		if err != nil || questionNo <= 0 || questionNo > len(survey.Questions) + 1 { //question should >= 1, question no. should not exceed total no. of questions + 1
 			c.JSON(400, gin.H{"error": "Invalid question number"})
 			return
 		}
 
-		arrIndex := questionNo - 1 //e.g. Q1 is at Questions[0]
+		arrIndex := questionNo - 1 //e.g. Q1 is at Questions[0], arrIndex means array index
 		var newQuestion Question
 		if err := c.BindJSON(&newQuestion); err != nil { //combine req. body with newQuestion
 			c.JSON(400, gin.H{"error": "Invalid input"})
@@ -465,12 +433,8 @@ func main() {
 		c.IndentedJSON(200, gin.H{"message": "The question is successfully inserted", "All Questions": survey.Questions})
 	})
 
-	//create a curl example token:5GXbe, adding a question between Q1 and Q2
-
-	// curl -X POST http://localhost:8080/surveys/5GXbe/2 -H "Content-Type: application/json" -d '{"question":"What is your favourite color?", "question_format":"Multiple Choice", "specification":["red","blue","green"]}'
-
-//delete a survey
-	router.DELETE("/surveys/:token", func(c *gin.Context) {
+//edit a question
+	router.PUT("/surveys/:token/:questionNo", func(c *gin.Context) {
 		token := c.Param("token") // get the input token
 		if checkToken(token,c) != nil {
 			return
@@ -479,20 +443,53 @@ func main() {
 		var survey Survey
 
 		err := surveysCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&survey) // search survey
-
 		if err != nil {
 			c.JSON(404, gin.H{"error": "Survey not found"})
 			return
 		}
 
-		// Delete the survey from the db based on the token
-		_, err = surveysCollection.DeleteOne(context.TODO(),bson.M{"token": token})
-
-		if err != nil {
-			c.JSON(500, gin.H{"error": "Failed to delete survey"})
+		questionNo, err := strconv.Atoi(c.Param("questionNo")) // get the question number string -> int
+		if err != nil || questionNo <= 0 || questionNo > len(survey.Questions) {
+			c.JSON(400, gin.H{"error": "Invalid question number"})
 			return
 		}
-		c.JSON(200, gin.H{"message": "Survey successfully deleted"})
+
+		var editQuestion EditQuestion
+		if err := c.BindJSON(&editQuestion); err != nil { //combine req. body with editQuestion
+			c.JSON(400, gin.H{"error": "Invalid input"})
+			return
+		}
+
+		arrIndex := questionNo - 1 //e.g. Q1 is at Questions[0]
+
+		survey.Questions[arrIndex].Question = editQuestion.Question
+		survey.Questions[arrIndex].QuestionFormat = editQuestion.QuestionFormat
+		survey.Questions[arrIndex].Specification = editQuestion.Specification
+
+		//check all questions
+		if (validateQuestions(survey.Questions, c)) != nil {
+			return
+		}
+
+		if(survey.Responses != nil) { //if the survey has no responses, no need to delete the responses
+			//All responses of this question will be deleted, preventing unmatched responses
+			for i := range survey.Responses { //loop all responses
+				survey.Responses[i].Answer[arrIndex] = "Deleted" //set the answer of this question to be "Deleted"
+			}
+		}
+
+		survey.LastModifiedTime = time.Now().Format("2006-01-02 15:04:05")  //update the time of the survey last modified
+
+		// update in the database
+		_, err = surveysCollection.UpdateOne(context.TODO(),
+			bson.M{"token": token}, 
+			bson.M{"$set": bson.M{"questions": survey.Questions, "lastModifiedTime": survey.LastModifiedTime, "responses": survey.Responses}}) //update the question arr which has one edited question
+
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Failed to update a question"})
+			return
+		}
+		c.JSON(200, gin.H{"message": "The survey question successfully updated"})
 	})
 
 //delete a question
@@ -539,7 +536,7 @@ func main() {
 
 		survey.LastModifiedTime = time.Now().Format("2006-01-02 15:04:05")  //update the time of the survey last modified
 
-		//process the responses, if the question is deleted, the answer of this question will be deleted,and the rest of the answers will be shifted to the left
+		// if the question is deleted, the answer of this question should also be deleted,and the rest of the answers should be shifted to the left
 		for i := range survey.Responses { //loop all responses
 			if arrIndex < len(survey.Responses[i].Answer) { //if the question is not the last question
 				survey.Responses[i].Answer = append(survey.Responses[i].Answer[:arrIndex], survey.Responses[i].Answer[arrIndex+1:]...) //shift the answer to the left
@@ -594,7 +591,7 @@ func main() {
 			return
 		}
 
-		//check the no of answers is eqal to no. of questions
+		//check the no. of answers is equal to no. of questions
 		if len(response.Answer) != len(survey.Questions) {
 			c.JSON(400, gin.H{"error": "Please answer the exact number of questions"})
 			return
