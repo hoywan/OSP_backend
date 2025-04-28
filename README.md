@@ -154,7 +154,6 @@ Responses
 |:---------:|:------:|:----------------------:|
 |      |     {"error":"Invalid input"}        |      Binding input error      |
 |      |     {"error":"The Survey Title already exists"}        |     The Survey Title already exists in DB     |
-|      |     {"error":"The survey title must have at least 3 characters"}        | survey title less than 3 characters |
 |      |     {"error":"The Survey title should be 2 to 300 characters"}        | The Survey title should be 2 to 300 characters |
 |      |     {"error":"Cannot be an empty survey"}        | no questions |
 |      |       {"error":"The question title should have at least 3 characters"}      | question title less than 3 characters |
@@ -282,7 +281,6 @@ Responses:
 |      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
 |      |    {"error":"Invalid input"}         |      Binding input error      |
 |      |     {"error":"The Survey Title already exists"}        |     The Survey Title already exists in DB     |
-|      |     {"error":"The survey title must have at least 3 characters"}        | survey title less than 3 characters |
 |      |     {"error":"The Survey title should be 2 to 300 characters"}        | The Survey title should be 2 to 300 characters |
 |      |      {"error":"Cannot be an empty survey"}       | no questions |
 |      | {"error":"The question title should have at least 3 characters"} | question title less than 3 characters |
@@ -320,10 +318,9 @@ repsonse:
 
 {"message":"Survey successfully deleted"}
 
-|    400   |  Bad Request  |       Description      |
-|      |             | Invalid token e.g. not equal to 5 characters or containing any special characters    |
-
-{"error":"Invalid token"}
+|    400   |  Output  |       Description      |
+|:---------:|:------:|:----------------------:|
+|      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
 
 | 404 | Survey not found with the input token |
 |------|----------|
@@ -332,15 +329,13 @@ repsonse:
 
 | 500 | Internal Server Error |
 |------|----------|
-|      |Failed to delete survey|
-
-{"error":"Failed to delete survey"}
+|  {"error":"Failed to delete survey"}    |Failed to delete survey|
 
 ### Question
 
-### (1) Editing a question
+### (1) Inserting a question
 
-| PUT | /surveys/:token/:questionNo |
+| POST | /surveys/:token/:questionNo |
 |------|----------|
 
 Parameters: token(string), questionNo(string)[-> Integer later]
@@ -358,7 +353,106 @@ Schema:
 Example (change the question 1 of survey with token 5GXbe):
 
 ```terminal
-curl -X PUT http://localhost:8080/surveys/5GXbe/1 \
+curl -X POST http://localhost:8080/surveys/5GXbe/2 \
+-H "Content-Type: application/json" \
+-d '{
+	"question": "Do you want to know the topic in depth?",
+	"question_format": "Likert Scale",
+	"specification": ["Definitely No", "No", "No commnet", "Yes", "Definitely"]
+}'
+```
+
+Responses:
+| 200 | The question is successfully inserted with a preview of all questins |
+|------|----------|
+
+```terminal
+{
+    "All Questions": [
+        {
+            "question": "What do you think about the difficulty of the lecture material?",
+            "question_format": "Likert Scale",
+            "specification": [
+                "Very Easy",
+                "Easy",
+                "Neutral",
+                "Difficult",
+                "Very Difficult"
+            ]
+        },
+        {
+            "question": "Do you want to know the topic in depth?",
+            "question_format": "Likert Scale",
+            "specification": [
+                "Definitely No",
+                "No",
+                "No commnet",
+                "Yes",
+                "Definitely"
+            ]
+        },
+        {
+            "question": "What do you think about my lecture style?",
+            "question_format": "Multiple Choice",
+            "specification": [
+                "Bad",
+                "Good"
+            ]
+        },
+        {
+            "question": "Type a comment about the lecture",
+            "question_format": "Textbox",
+            "specification": []
+        }
+    ],
+    "message": "The question is successfully inserted"
+}
+```
+
+|    400   |  Output  |       Description      |
+|:---------:|:------:|:----------------------:|
+|      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
+|      |     {"error":"Invalid input"}        |      Binding input error      |
+|      |     {"error":"Invalid question number"}       |      Invalid question number e.g. less or equal than 0 or exceed the total no. of questions     |
+|      |     {"error":"The Survey title should be 2 to 300 characters"}        | The Survey title should be 2 to 300 characters |
+|      |     {"error":"The Survey Title already exists"}        | The Survey Title already exists in DB |
+|      |      {"error":"Cannot be an empty survey"}       | no questions |
+|      |     {"error":"The question title should have at least 3 characters"}        | question title less than 3 characters |
+|      |     {"error":"Invalid question format"}        | not either "Textbox" / "Multiple Choice" / "Likert Scale" |
+|      |     {"error":"Textbox format should not have specification"}        | specification for "Textbox" is not empty  |
+|      |      {"error":"Multiple Choice question should have at least 2 options"}       | specification for "Multiple Choice" has less than 2 elements |
+|      |      {"error":"Likert Scale should have at least 3 options"}       | specification for "Likert Scale" has less than 3 elements |
+
+| 404 | Survey not found with the input token |
+|------|----------|
+
+{"error":"Survey not found"}
+
+| 500 | Internal Server Error |
+|------|----------|
+|   {"error":"Failed to insert a question"}   |Failed to insert a question|
+
+### (2) Editing a question
+
+| PUT | /surveys/:token/:questionNo |
+|------|----------|
+
+Parameters: token(string), questionNo(string)[-> Integer later]
+
+Request body:
+
+Schema:
+
+|    Name   |  Type  |       Description      |
+|:---------:|:------:|:----------------------:|
+|   question   | string |      question title      |
+| question_format |  string | "Textbox" / "Multiple Choice" / "Likert Scale" |
+| specification |  array | empty for "Textbox", > 2 elements for "Multiple Choice", > 3 elements for "Likert Scale" |
+
+Example (Edit the question 2 of survey with token 5GXbe):
+
+```terminal
+curl -X PUT http://localhost:8080/surveys/5GXbe/2 \
 -H "Content-Type: application/json" \
 -d '{
 	"question": "How satisfied are you with our service?",
@@ -378,7 +472,6 @@ Responses:
 |      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
 |      |     {"error":"Invalid input"}        |      Binding input error      |
 |      |     {"error":"Invalid question number"}       |      Invalid question number e.g. less or equal than 0 or exceed the total no. of questions     |
-|      |     {"error":"The survey title must have at least 3 characters"}        | survey title less than 3 characters |
 |      |      {"error":"Cannot be an empty survey"}       | no questions |
 |      |     {"error":"The question title should have at least 3 characters"}        | question title less than 3 characters |
 |      |     {"error":"Invalid question format"}        | not either "Textbox" / "Multiple Choice" / "Likert Scale" |
@@ -397,7 +490,7 @@ Responses:
 
 {"error":"Failed to update a question"}
 
-### (2) Deleting a question
+### (3) Deleting a question
 
 | DELETE | /surveys/:token/:questionNo |
 |------|----------|
@@ -511,7 +604,7 @@ curl -X GET http://localhost:8080/surveys/5GXbe/responses/overview
 
 Response:
 
-| 200 | Output a JSON containing response array |
+| 200 | Output a JSON containing title, number of responses, questions array storing (question + all answers for that question) |
 |------|----------|
 
 ```terminal
@@ -552,7 +645,7 @@ curl -X GET http://localhost:8080/surveys/5GXbe/responses/individual
 
 Response:
 
-| 200 | Output a JSON containing response array |
+| 200 | Output a JSON containing survey title and responses array storing name and Q&A pairs |
 |------|----------|
 
 ```terminal
@@ -616,17 +709,14 @@ Response:
     ]
 }
 ```
-|    400   |  Bad Request  |       Description      |
+|    400   | Output  |       Description      |
 |:---------:|:------:|:----------------------:|
-|      |             | Invalid token e.g. not equal to 5 characters or containing any special characters    |
+|      |      {"error":"Invalid token"}       | Invalid token e.g. not equal to 5 characters or containing any special characters    |
+|      |      {"error":"Invalid display mode"}       | the input display mode is nither individual nor overview    |
 
-{"error":"Invalid token"}
 
-| 404 | Survey not found with the input token |
+
+| 404 | Description |
 |------|----------|
-|      |No response e.g. the response array does not exists or empty|
-
-
-{"error":"Survey not found"}
-
-{"error":"No response"}
+|   {"error":"Survey not found"}   |Survey not found with the input token |
+|   {"error":"No response"}   |No response e.g. the response array does not exists or empty|
