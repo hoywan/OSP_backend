@@ -47,7 +47,14 @@ db.createUser(
 4.	Click "Open Folder" in VS code to open the folder, which should contains .env and main.go e.g. OSP_backend-main
 5.	Change the "DB_USERNAME" and "DB_PASSWORD" in the .env file if you change the user and pwd in step 6 in "Install MongoDB"
 6.	Click "Ctrl", "Shift" and "`" at the same time to open a new terminal
-7.	Fix go module
+
+7.	Enter "go run ." in the terminal, all dependencies will be installed automatically. You can go to step 10. If not, you follow step 8 - 9.
+
+```terminal
+go run .
+```
+
+8.	Fix go module
 
 ```terminal
 go env -w GO111MODULE=on
@@ -55,22 +62,22 @@ go env -w GO111MODULE=on
 ```terminal
 go mod init OSP_backend-main{replace here with your folder name}
 ```
-8.	Install dependencies by entering the commands below one by one with/without sudo
+9.	Install dependencies by entering the commands below one by one with/without sudo
 
 ```teminal
-sudo go get github.com/joho/godotenv
-sudo go get go.mongodb.org/mongo-driver/mongo
-sudo go get go.mongodb.org/mongo-driver/bson
-sudo go get go.mongodb.org/mongo-driver/mongo/options
-sudo go get github.com/gin-gonic/gin
+go get github.com/joho/godotenv
+go get go.mongodb.org/mongo-driver/mongo
+go get go.mongodb.org/mongo-driver/bson
+go get go.mongodb.org/mongo-driver/mongo/options
+go get github.com/gin-gonic/gin
 
 ```
 
-9.	Enter "go run ." in the terminal, "Listening and serving HTTP on :8080" should be shown on the last output, which means the server is running
-10.	For MacOS user, you can type curl command in the terminal app by following the doumentation below
+10.	Enter "go run ." in the terminal, "Listening and serving HTTP on :8080" should be shown on the last output, which means the server is running
+11.	For MacOS user, you can type curl command in the terminal app by following the doumentation below
 For Windows user, you can install an extension on <a target="_blank" href="https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok">https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok</a>
 and enter curl command in <a target="_blank" href="https://reqbin.com/curl">https://reqbin.com/curl</a>
-11.	You can check view all data inside OSP>Survey in the MongoDB compass after you create one survey.
+12.	You can check view all data inside OSP>Survey in the MongoDB compass after you create one survey.
 
 ### Solution to MongoDB problem (can't be connected, ECONNREFUSED 127.0.0.1:27017 in Compass)
 Enter the below in terminal to restart the service
@@ -378,7 +385,7 @@ Schema:
 | question_format |  string | "Textbox" / "Multiple Choice" / "Likert Scale" |
 | specification |  array | empty for "Textbox", > 2 elements for "Multiple Choice", > 3 elements for "Likert Scale" |
 
-Example (change the question 1 of survey with token 5GXbe):
+Example (add the new question 2 to the survey with token 5GXbe, the existed question 2 -> question 3):
 
 ```terminal
 curl -X POST http://localhost:8080/surveys/5GXbe/2 \
