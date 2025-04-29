@@ -187,7 +187,7 @@ Responses
 |------|----------|
 |   {"error":"Failed to check token"}   |Failed to check token|
 |  {"error":"Failed to create survey"}    |Failed to create survey|
-|  {"error":"Failed to generate a unique token"}    |Failed to generate a unique token|
+|  {"error":"Failed to generate a unique token"}    |Failed to generate a unique token when all gen tokens are used within 400 iterations|
 |  {"error":"Failed to check the survey title"}    |Failed to check title|
 
 ### (2) Displaying a survey
