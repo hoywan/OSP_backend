@@ -43,7 +43,7 @@ db.createUser(
 
 1.	Click link of the VS code official website <a target="_blank" href="https://code.visualstudio.com/download">https://code.visualstudio.com/download</a> and download a compatible version based on your OS
 2.	Install it
-3.	Donwload this repository and unzip it,
+3.	Donwload this repository and unzip it
 4.	Click "Open Folder" in VS code to open the folder, which should contains .env and main.go e.g. OSP_backend-main
 5.	Change the "DB_USERNAME" and "DB_PASSWORD" in the .env file if you change the user and pwd in step 6 in "Install MongoDB"
 6.	Click "Ctrl", "Shift" and "`" at the same time to open a new terminal
@@ -62,7 +62,7 @@ go env -w GO111MODULE=on
 ```terminal
 go mod init OSP_backend-main{replace here with your folder name}
 ```
-9.	Install dependencies by entering the commands below one by one with/without sudo
+9.	Install dependencies by entering the commands below one by one with/without sudo. Enter "go run ." in the terminal.
 
 ```teminal
 go get github.com/joho/godotenv
@@ -73,7 +73,11 @@ go get github.com/gin-gonic/gin
 
 ```
 
-10.	Enter "go run ." in the terminal, "Listening and serving HTTP on :8080" should be shown on the last output, which means the server is running
+```terminal
+go run ."
+```
+
+10.	"Listening and serving HTTP on :8080" should be shown on the last output, which means the server is running
 11.	For MacOS user, you can type curl command in the terminal app by following the doumentation below
 For Windows user, you can install an extension on <a target="_blank" href="https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok">https://chromewebstore.google.com/detail/reqbin-http-client/gmmkjpcadciiokjpikmkkmapphbmdjok</a>
 and enter curl command in <a target="_blank" href="https://reqbin.com/curl">https://reqbin.com/curl</a>
