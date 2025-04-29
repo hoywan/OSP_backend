@@ -1,5 +1,5 @@
 package main
-//import all dependencies
+//import all dependencies needed
 import (
 	"context"
 	"fmt"
@@ -42,12 +42,12 @@ type Survey struct {
 	Responses []Response `json:"responses,omitempty"` //not create the responses field first
 }
 
-type SurveyWithResponses struct { //for displaying surveys that hv responses
-	ID string `bson:"_id,omitempty"`
-	Title string `json:"title"` //survey title
-	Token string `json:"token"`
+type SuveyOutputWithoutResponses struct { //for /get surveys that not displat resp
+	Title string `json:"title"`
+	Time string `json:"time"`
+	LastModifiedTime string `json:"last_modified_time" bson:"lastModifiedTime"` 
+	NumberOfQuestions int `json:"number_of_questions"`
 	Questions []Question `json:"questions"`
-	Responses []Response `json:"responses"`
 }
 
 type EditQuestion struct { //for editing surveys
@@ -57,24 +57,28 @@ type EditQuestion struct { //for editing surveys
 }
 
 //for displaying mode of response equal to individual 
+//it can help to form a prettier output i.e. follow the json structure, order
+
+//{title, responses=>{name, =>{question&ans  [q from question arr , ans from ans arr in resp arr]}, time(extract from each resp)}}}
 
 type QuestionAnswer struct {
 	Question string `json:"question"` //question title
 	Answer string `json:"answer"` //answer of the question
 }
-
 type IndividualResponses struct {
 	Name string `json:"name"` //name of the responder
 	QA []QuestionAnswer `json:"qa"`
 	Time string `json:"time"` //time of the response
 }
 
+//if not, the title will put at last for IndentedJSON, which follow letter order
 type FormattedIndividualResponses struct {
 	Title string `json:"title"`
 	Responses []IndividualResponses `json:"responses"`
 }
 
 //for displaying mode of response equal to overview 
+//{title + no. of responses + OvQ=>{question, ans}}
 
 type OverviewQuestions struct {
 	Question string `json:"question"` //question title
@@ -87,10 +91,11 @@ type FormattedOverviewResponses struct {
 }
 
 // global variable for the mongodb collection, so all api can access the collection
-var surveysCollection *mongo.Collection
+var surveysCollection *mongo.Collection	
 
-//generate random token when creating a new survey
-func generateRandomToken() string {
+var timeFormat = "2006-01-02 15:04:05" //time format must be this one, else not work, set to global for setting time in all APIs
+
+func generateRandomToken() string {	//generate random token when creating a new survey
 	//string containing all letters and numbers
 	const combination = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	const tokenLength = 5 //required length of token 
@@ -99,10 +104,10 @@ func generateRandomToken() string {
 	for i := range token {
 		randIndex := rand.Intn(len(combination)) //make a random index
 		token[i] = combination[randIndex] //choose it from the combination arr
-	} //e.g. {"d","w","2","a","3"}
+	}
 
 	//transform the byte array into a string arr and join all elements
-	return strings.Join([]string{string(token)}, "") //e.g. dw2a3
+	return strings.Join([]string{string(token)}, "")
 }
 
 //validate questions
@@ -124,7 +129,7 @@ func validateQuestions(questions []Question, c*gin.Context) error {
 			c.JSON(400, gin.H{"error": "Invalid question format"})
 			return fmt.Errorf("Invalid question format")
 		}
-		if questions[i].QuestionFormat == "Textbox" {
+		if questions[i].QuestionFormat == "Textbox" { // it prevent user input any irrelevant data in textboc spec, also prevent storing unnecessary data in db
 			if (len(questions[i].Specification) > 0) {
 				c.JSON(400, gin.H{"error": "Textbox format should not have specification"})
 				return fmt.Errorf("Textbox format should not have specification")
@@ -235,7 +240,7 @@ func main() {
 		var survey Survey
 		err := c.BindJSON(&survey)
 		if (err != nil) { //combining the request body with the survey object
-			c.JSON(400, gin.H{"error": "Invalid input"})
+			c.JSON(400, gin.H{"error": "Invalid input for constructing a survey"})
 			return
 		}
 
@@ -245,7 +250,7 @@ func main() {
 		}
 
 		//check token is not repeated, else gen a new one
-		var tempIteration int = 0 //to prevent infinite loop
+		var tempIteration int = 0 //to prevent infinite loop althougth it has extremely little chance to encounter this problem, it may happen when very many surveys are created, and most of tokens are occupied
 
 		for (true) {
 			survey.Token = generateRandomToken()
@@ -261,7 +266,7 @@ func main() {
 				break
 			}
 
-			if (tempIteration > 100) { //if the token is not unique for 100 times, break the loop
+			if (tempIteration > 400) { //if the token is not unique for 400 times, break the loop
 				c.JSON(500, gin.H{"error": "Failed to generate a unique token"})
 				return
 			}
@@ -273,8 +278,8 @@ func main() {
 			return //hv error
 		}
 
-		//get the current time, the format must be set to this one, else will not work
-		survey.Time = time.Now().Format("2006-01-02 15:04:05") //time of the survey created
+		//get the current time save it as created time, and last time "modified"
+		survey.Time = time.Now().Format(timeFormat) //time of the survey created
 		survey.LastModifiedTime = survey.Time //time of the survey last modified
 
 		//set the responses to be empty
@@ -305,8 +310,8 @@ func main() {
 			c.JSON(404, gin.H{"error": "Survey not found"})
 			return
 		}
-		// return the survey title & questions
-		c.IndentedJSON(200, gin.H{"questions": survey.Questions, "title": survey.Title, "number_of_questions": len(survey.Questions), "time": survey.Time, "lastModifiedTime": survey.LastModifiedTime}) //IndentedJSON is for prettier output
+		// using SuveyOutputWithoutResponses struct
+		c.IndentedJSON(200, SuveyOutputWithoutResponses{ Title: survey.Title, Time: survey.Time, LastModifiedTime: survey.LastModifiedTime, NumberOfQuestions: len(survey.Questions), Questions: survey.Questions,}) //IndentedJSON is for prettier output
 	})
 
 // edit a survey in all fields
@@ -326,7 +331,7 @@ func main() {
 
 		err = c.BindJSON(&survey)
 		if (err != nil) { //combining the request body with the survey object
-			c.JSON(400, gin.H{"error": "Invalid input"})
+			c.JSON(400, gin.H{"error": "Invalid input for constructing a survey"})
 			return
 		}
 
@@ -343,7 +348,7 @@ func main() {
 		//All responses will be deleted if the survey is updated, preventing unmatched questions and responses
 		survey.Responses = []Response{} //set the responses to be empty
 
-		survey.LastModifiedTime = time.Now().Format("2006-01-02 15:04:05")  //update the time of the survey last modified
+		survey.LastModifiedTime = time.Now().Format(timeFormat)  //update the time of the survey last modified
 
 		// update this survey in the db
 
@@ -413,7 +418,7 @@ func main() {
 
 		err = c.BindJSON(&newQuestion)
 		if (err != nil) { //combining the request body with the survey object
-			c.JSON(400, gin.H{"error": "Invalid input"})
+			c.JSON(400, gin.H{"error": "Invalid input for creating a question"})
 			return
 		}
 
@@ -446,7 +451,7 @@ func main() {
 				}
 		}
 
-		survey.LastModifiedTime = time.Now().Format("2006-01-02 15:04:05")  //update the time of the survey last modified
+		survey.LastModifiedTime = time.Now().Format(timeFormat)  //update the time of the survey last modified
 
 		// update the survey in the database
 		_, err = surveysCollection.UpdateOne(context.TODO(),
@@ -483,7 +488,7 @@ func main() {
 		var editQuestion EditQuestion
 		err = c.BindJSON(&editQuestion)
 		if (err != nil) {
-			c.JSON(400, gin.H{"error": "Invalid input"})
+			c.JSON(400, gin.H{"error": "Invalid input for editing a question"})
 			return
 		}
 
@@ -505,7 +510,7 @@ func main() {
 			}
 		}
 
-		survey.LastModifiedTime = time.Now().Format("2006-01-02 15:04:05")  //update the time of the survey last modified
+		survey.LastModifiedTime = time.Now().Format(timeFormat)  //update the time of the survey last modified
 
 		// update in the database
 		_, err = surveysCollection.UpdateOne(context.TODO(),
@@ -561,7 +566,7 @@ func main() {
 			return
 		}
 
-		survey.LastModifiedTime = time.Now().Format("2006-01-02 15:04:05")  //update the time of the survey last modified
+		survey.LastModifiedTime = time.Now().Format(timeFormat)  //update the time of the survey last modified
 
 		// if the question is deleted, the answer of this question should also be deleted,and the rest of the answers should be shifted to the left
 		for i := range survey.Responses { //loop all responses
@@ -601,12 +606,12 @@ func main() {
 		var response Response
 		err = c.BindJSON(&response)
 		if (err != nil) { //combining the request body with the empty response obj
-			c.JSON(400, gin.H{"error": "Invalid input"})
+			c.JSON(400, gin.H{"error": "Invalid input for submitting a response"})
 			return
 		}
 
 		//get the current time, the format must be set to this one, else will not work
-		response.Time = time.Now().Format("2006-01-02 15:04:05")
+		response.Time = time.Now().Format(timeFormat)
 
 		if (len(response.Name) < 2) || (len(response.Name) > 100) { //response name should be 2 to 100 char
 			c.JSON(400, gin.H{"error": "Your Name should be 2 to 100 characters"})
@@ -666,7 +671,7 @@ func main() {
 			return
 		}
 
-		var survey SurveyWithResponses
+		var survey Survey
 
 		err := surveysCollection.FindOne(context.TODO(), bson.M{"token": token}).Decode(&survey)
 		if (err != nil) {
@@ -712,8 +717,7 @@ func main() {
 					Name: response.Name, QA: qa, Time: response.Time,
 				})
 			}
-			formatted := FormattedIndividualResponses{Title: survey.Title, Responses: individualResponses,}
-			c.IndentedJSON(200, formatted)
+			c.IndentedJSON(200, FormattedIndividualResponses{Title: survey.Title, Responses: individualResponses,})
 			
 		} else if (displayMode == "overview") {
 			var overviewQuestions []OverviewQuestions //used to store multiple questions with their answers+analysis
@@ -742,11 +746,9 @@ func main() {
 				})
 			}
 
-			formatted := FormattedOverviewResponses{
+			c.IndentedJSON(200, FormattedOverviewResponses{
 				Title: survey.Title, NumberOfResponses: len(survey.Responses), Questions: overviewQuestions,
-			}
-
-			c.IndentedJSON(200, formatted)
+			})
 		}
 
 		//old version
