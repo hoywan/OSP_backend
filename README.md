@@ -214,7 +214,10 @@ Responses:
 Example:
 ```terminal
 {
-    "lastModifiedTime": "2025-04-28 16:04:53",
+{
+    "title": "Lecture Satisfaction Survey 2",
+    "time": "2025-04-29 20:38:52",
+    "last_modified_time": "2025-04-29 20:38:52",
     "number_of_questions": 3,
     "questions": [
         {
@@ -241,9 +244,7 @@ Example:
             "question_format": "Textbox",
             "specification": []
         }
-    ],
-    "time": "2025-04-28 16:04:53",
-    "title": "Lecture Satisfaction Survey 7"
+    ]
 }
 ```
 
