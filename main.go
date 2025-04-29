@@ -131,13 +131,13 @@ func validateQuestions(questions []Question, c*gin.Context) error {
 			}
 		} else if (questions[i].QuestionFormat == "Multiple Choice") {
 			//check the array have at least 2 elements
-			if len(questions[i].Specification) < 2 {
+			if (len(questions[i].Specification) < 2) {
 				c.JSON(400, gin.H{"error": "Multiple Choice question should have at least 2 options"})
 				return fmt.Errorf("Multiple Choice question should have at least 2 options")
 			}
 		} else { //Likert Scale
 			//check the array have at least 3 elements
-			if len(questions[i].Specification) < 3 {
+			if (len(questions[i].Specification) < 3) {
 				c.JSON(400, gin.H{"error": "Likert Scale should have at least 3 options"})
 				return fmt.Errorf("Likert Scale should have at least 3 options")
 			}
@@ -534,7 +534,7 @@ func main() {
 		}
 
 		questionNo, err := strconv.Atoi(c.Param("questionNo")) // get the question number string -> int
-		if (err != nil || questionNo < 0 || questionNo > len(survey.Questions)) { //question should >= 1, question number should not exceed total no of questinos
+		if (err != nil || questionNo < 0 || questionNo > len(survey.Questions)) { //question should >= 1, question number should not exceed total no. of questinos
 			c.JSON(400, gin.H{"error": "Invalid question number"})
 			return
 		}
