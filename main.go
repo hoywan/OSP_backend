@@ -217,23 +217,15 @@ func main() {
 
 
 	//use indexes to speed up the search, use token as index since it is commonly used in most APIs
-	indexModel := mongo.IndexModel{
-		Keys: bson.M{"token": 1}, //create index on token
+	indMod := mongo.IndexModel{
+		Keys: bson.M{"token": 1}, //create index on token index_1
 		Options: options.Index().SetUnique(true), //set the index to be unique
 	}
-	_, err = surveysCollection.Indexes().CreateOne(context.TODO(), indexModel) //create the index
+	ind, err := surveysCollection.Indexes().CreateOne(context.TODO(), indMod) //create the index
 	if (err != nil) {
 		log.Fatal(err)
-	}
-
-	//also question no, but not unique
-	indexModel = mongo.IndexModel{
-		Keys: bson.M{"questions.question": 1},
-		Options: options.Index().SetUnique(false),
-	}
-	_, err = surveysCollection.Indexes().CreateOne(context.TODO(), indexModel) //create the index
-	if (err != nil) {
-		log.Fatal(err)
+	} else {
+		fmt.Println("index:", ind)
 	}
 
 	router := gin.Default() //use Default instead of New, so default logger & recovery middleware can be used
