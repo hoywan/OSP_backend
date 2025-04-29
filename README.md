@@ -162,18 +162,18 @@ Responses:
 |------|----------|
 
 Example:
-{"message":"Survey successfully created. The token of this survey is: 5GXbe"}
+{"message":"Survey successfully created. The token of this survey is: kFZK4"}
 
-The token is random generated, so it has very little chance to be "5GXbe" again. You should use the one generated when trying other APIs.
+The token is random generated, so it has very little chance to be "kFZK4" again. You should use the one generated when trying other APIs.
 
 Responses
 
-<img width="662" alt="image" src="https://github.com/user-attachments/assets/94d06121-662d-4f22-b26c-113546155e7a" />
+<img width="1039" alt="image" src="https://github.com/user-attachments/assets/931df133-7362-4d86-91ed-7fe34fd48ee7" />
 
 
 |    400   |  Output  |       Description      |
 |:---------:|:------:|:----------------------:|
-|      |     {"error":"Invalid input"}        |      Binding input error      |
+|      | {"error":"Invalid input for constructing a survey"}| Binding error happened when input not match survey struct e.g. "," added after last data |
 |      |     {"error":"The Survey Title already exists"}        |     The Survey Title already exists in DB     |
 |      |     {"error":"The Survey title should be 2 to 300 characters"}        | The Survey title should be 2 to 300 characters |
 |      |     {"error":"Cannot be an empty survey"}        | no questions |
@@ -199,7 +199,7 @@ Parameters: token(string)
 Example
 
 ```terminal
-curl -X GET http://localhost:8080/surveys/5GXbe
+curl -X GET http://localhost:8080/surveys/kFZK4
 ```
 
 Explaination:
@@ -314,7 +314,7 @@ Responses:
 |    400   |  Bad Request  |       Description      |
 |:---------:|:------:|:----------------------:|
 |      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
-|      |    {"error":"Invalid input"}         |      Binding input error      |
+|      |    {"error":"Invalid input for constructing a survey"}         |      Binding error happend when input not match survey struct     |
 |      |     {"error":"The Survey Title already exists"}        |     The Survey Title already exists in DB     |
 |      |     {"error":"The Survey title should be 2 to 300 characters"}        | The Survey title should be 2 to 300 characters |
 |      |      {"error":"Cannot be an empty survey"}       | no questions |
@@ -466,7 +466,7 @@ Responses:
 |    400   |  Output  |       Description      |
 |:---------:|:------:|:----------------------:|
 |      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
-|      |     {"error":"Invalid input"}        |      Binding input error      |
+|      |     {"error":"Invalid input for creating a question"}        |      Error happened when input not match to newQuestion struct     |
 |      |     {"error":"Invalid question number"}       |      Invalid question number e.g. less or equal than 0 or exceed the total no. of questions     |
 |      |     {"error":"The Survey title should be 2 to 300 characters"}        | The Survey title should be 2 to 300 characters |
 |      |     {"error":"The Survey Title already exists"}        | The Survey Title already exists in DB |
@@ -535,7 +535,7 @@ Responses:
 |    400   |  Output  |       Description      |
 |:---------:|:------:|:----------------------:|
 |      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
-|      |     {"error":"Invalid input"}        |      Binding input error      |
+|      |     {"error":"Invalid input for editing a question"}        |      Error happened when input not match editQuestion struct    |
 |      |     {"error":"Invalid question number"}       |      Invalid question number e.g. less or equal than 0 or exceed the total no. of questions     |
 |      |      {"error":"Cannot be an empty survey"}       | no questions |
 |      |     {"error":"The question title should have at least 3 characters"}        | question title less than 3 characters |
@@ -648,7 +648,7 @@ Response:
 |    400   |  Output  |       Description      |
 |:---------:|:------:|:----------------------:|
 |      |     {"error":"Invalid token"}        | Invalid token e.g. not equal to 5 characters or containing any special characters    |
-|      |     {"error":"Invalid input"}        |      Binding input error      |
+|      |     {"error":"Invalid input for submitting a response"}        |      Error happened when the input not match the response struct     |
 |      |     {"error":"Invalid question number"}       |      Invalid question number e.g. less or equal than 0 or exceed the total no. of questions     |
 |      |     {"error":"Your Name should be 2 to 100 characters"}        |      response name should be 2 to 100 char     |
 |      |      {"error":"Not allow empty response"}       |     response not contain any answers     |
